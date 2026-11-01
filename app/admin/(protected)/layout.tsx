@@ -3,6 +3,8 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { ToastProvider } from "@/components/ui/toast";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = await requireAdmin();
 

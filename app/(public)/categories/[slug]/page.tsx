@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ProductGridSkeleton, ProductResults } from "@/components/catalog/ProductResults";
 import { ResponsiveProductFilters } from "@/components/catalog/ResponsiveProductFilters";
 import { parseCatalogFilters, type CatalogSearchParams } from "@/lib/catalog/filters";
-import { getCategories, getCategoryBySlug } from "@/lib/supabase/catalog";
+import { getCategoryBySlug } from "@/lib/supabase/catalog";
 
 type PageProps = { params: Promise<{ slug: string }>; searchParams: Promise<CatalogSearchParams> };
 
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CategoryDetailPage({ params, searchParams }: PageProps) {
   const [{ slug }, search] = await Promise.all([params, searchParams]);
-  const [category, categories] = await Promise.all([getCategoryBySlug(slug), getCategories()]);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
   const filters = parseCatalogFilters(search);
@@ -28,8 +28,8 @@ export default async function CategoryDetailPage({ params, searchParams }: PageP
       {category.description && <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#666]">{category.description}</p>}
     </header>
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
-      <ResponsiveProductFilters categories={categories} filters={filters} action={`/categories/${category.slug}`} showCategory={false} />
-      <div className="min-w-0 w-full"><Suspense fallback={<ProductGridSkeleton />}><ProductResults filters={filters} categorySlug={slug} clearHref={`/categories/${category.slug}`} includeCategory={false} /></Suspense></div>
+      <ResponsiveProductFilters categories={[]} filters={filters} action={`/categories/${category.slug}`} showCategory={false} />
+      <div className="min-w-0 w-full"><Suspense fallback={<ProductGridSkeleton />}><ProductResults filters={filters} categoryId={category.id} clearHref={`/categories/${category.slug}`} includeCategory={false} /></Suspense></div>
     </div>
   </main>;
 }

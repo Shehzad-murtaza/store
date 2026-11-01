@@ -21,7 +21,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound();
 
   const related = product.category_id && product.category
-    ? await getProducts({ categorySlug: product.category.slug, excludeId: product.id, limit: 4, sort: "newest" })
+    ? await getProducts({ categoryId: product.category_id, excludeId: product.id, limit: 4, sort: "newest" })
     : [];
   const hasDiscount = product.discount_price !== null;
   const currentPrice = hasDiscount ? product.discount_price! : product.price;

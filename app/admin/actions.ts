@@ -43,7 +43,7 @@ async function removeStoragePaths(paths: Array<string | null>) {
 export async function logoutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/admin/login");
+  redirect("/");
 }
 
 export async function saveCategory(formData: FormData): Promise<AdminActionResult> {

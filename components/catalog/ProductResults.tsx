@@ -20,13 +20,14 @@ export function ProductGridSkeleton() {
   </div>;
 }
 
-export async function ProductResults({ filters, categorySlug, clearHref, includeCategory = true }: {
+export async function ProductResults({ filters, categoryId, categorySlug, clearHref, includeCategory = true }: {
   filters: ParsedCatalogFilters;
+  categoryId?: string;
   categorySlug?: string;
   clearHref: string;
   includeCategory?: boolean;
 }) {
-  const products = await getProducts(categorySlug ? { ...filters, categorySlug } : filters);
+  const products = await getProducts(categoryId ? { ...filters, categoryId } : categorySlug ? { ...filters, categorySlug } : filters);
   if (!products.length) {
     const filtered = hasActiveFilters(filters, includeCategory);
     return <EmptyState

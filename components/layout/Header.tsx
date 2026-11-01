@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { createClient } from "@/lib/supabase/client";
 
 const links = [
   { label: "Home", href: "/" },
@@ -16,7 +17,22 @@ const links = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const pathname = usePathname();
+  const authEventRevision = useRef(0);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      authEventRevision.current += 1;
+      setShowDashboard(event !== "SIGNED_OUT" && Boolean(session?.user));
+    });
+    const revisionAtRequest = authEventRevision.current;
+    void supabase.auth.getUser().then(({ data: { user } }) => {
+      if (authEventRevision.current === revisionAtRequest) setShowDashboard(Boolean(user));
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -31,6 +47,7 @@ export function Header() {
           {links.map((link) => <Link key={link.label} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`text-[13px] transition-colors hover:text-black ${isActive(link.href) ? "font-semibold text-[#111]" : "text-[#555]"}`}>{link.label}</Link>)}
         </nav>
         <div className="flex items-center gap-2">
+        {showDashboard && <Link href="/admin" className="inline-flex h-10 items-center rounded-lg px-3 text-sm font-medium text-[#444] transition-colors hover:bg-[#f0f0f0] hover:text-[#111]">Dashboard</Link>}
         <ThemeToggle />
         <button
           type="button"

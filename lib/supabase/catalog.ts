@@ -12,6 +12,7 @@ export interface ProductWithCatalogData extends Product {
 }
 
 export interface ProductFilters {
+  categoryId?: string;
   categorySlug?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -22,19 +23,20 @@ export interface ProductFilters {
   limit?: number;
 }
 
-type ProductRow = Product & { product_images: ProductImage[] };
+type ProductRow = Product & {
+  product_images: ProductImage[];
+  category?: Pick<Category, "id" | "name" | "slug"> | null;
+};
 
-function mapProduct(row: ProductRow, categoryMap: Map<string, Category>): ProductWithCatalogData {
+function mapProduct(row: ProductRow): ProductWithCatalogData {
   const images = [...(row.product_images ?? [])].sort((a, b) => {
     if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
     return a.sort_order - b.sort_order;
   });
-  const category = row.category_id ? categoryMap.get(row.category_id) : undefined;
-
   return {
     ...row,
     product_images: images,
-    category: category ? { id: category.id, name: category.name, slug: category.slug } : null,
+    category: row.category ?? null,
     primary_image_url: images[0]?.image_url ?? null,
   };
 }
@@ -74,17 +76,15 @@ export async function getCategoryById(id: string): Promise<Category | null> {
 
 export async function getProducts(filters: ProductFilters = {}): Promise<ProductWithCatalogData[]> {
   const supabase = await createClient();
-  const categories = await getCategories();
-  const categoryMap = new Map(categories.map((category) => [category.id, category]));
 
-  let categoryId: string | undefined;
-  if (filters.categorySlug) {
-    const category = categories.find((item) => item.slug === filters.categorySlug);
+  let categoryId = filters.categoryId;
+  if (!categoryId && filters.categorySlug) {
+    const category = await getCategoryBySlug(filters.categorySlug);
     if (!category) return [];
     categoryId = category.id;
   }
 
-  let query = supabase.from("products").select("*, product_images(*)");
+  let query = supabase.from("products").select("*, product_images(*), category:categories(id, name, slug)");
   if (categoryId) query = query.eq("category_id", categoryId);
   if (filters.availability === "in_stock") query = query.eq("is_sold", false);
   if (filters.availability === "sold") query = query.eq("is_sold", true);
@@ -109,7 +109,7 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
   const { data, error } = await query;
   if (error) throw new Error(`Could not load products: ${error.message}`);
 
-  const products = ((data ?? []) as unknown as ProductRow[]).map((product) => mapProduct(product, categoryMap));
+  const products = ((data ?? []) as unknown as ProductRow[]).map(mapProduct);
   if (filters.sort === "price-asc") {
     products.sort((a, b) => Number(a.discount_price ?? a.price) - Number(b.discount_price ?? b.price));
   } else if (filters.sort === "price-desc") {
@@ -121,24 +121,16 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
 
 export async function getProductBySlug(slug: string): Promise<ProductWithCatalogData | null> {
   const supabase = await createClient();
-  const [{ data, error }, categories] = await Promise.all([
-    supabase.from("products").select("*, product_images(*)").eq("slug", slug).maybeSingle(),
-    getCategories(),
-  ]);
+  const { data, error } = await supabase.from("products").select("*, product_images(*), category:categories(id, name, slug)").eq("slug", slug).maybeSingle();
   if (error) throw new Error(`Could not load product: ${error.message}`);
   if (!data) return null;
-  const categoryMap = new Map(categories.map((category) => [category.id, category]));
-  return mapProduct(data as unknown as ProductRow, categoryMap);
+  return mapProduct(data as unknown as ProductRow);
 }
 
 export async function getProductById(id: string): Promise<ProductWithCatalogData | null> {
   const supabase = await createClient();
-  const [{ data, error }, categories] = await Promise.all([
-    supabase.from("products").select("*, product_images(*)").eq("id", id).maybeSingle(),
-    getCategories(),
-  ]);
+  const { data, error } = await supabase.from("products").select("*, product_images(*), category:categories(id, name, slug)").eq("id", id).maybeSingle();
   if (error) throw new Error(`Could not load product: ${error.message}`);
   if (!data) return null;
-  const categoryMap = new Map(categories.map((category) => [category.id, category]));
-  return mapProduct(data as unknown as ProductRow, categoryMap);
+  return mapProduct(data as unknown as ProductRow);
 }
