@@ -19,6 +19,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const authEventRevision = useRef(0);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#eaeaea] bg-[#fafafa]/95 backdrop-blur">
+    <header className={isHome ? "home-hero-header sticky top-0 z-50 -mb-[68px] border-b border-transparent bg-transparent" : "sticky top-0 z-50 border-b border-[#eaeaea] bg-[#fafafa]/95 backdrop-blur"}>
       <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" aria-label="SHEZY home" className="inline-flex shrink-0 items-center"><BrandLogo width={126} /></Link>
         <nav className="hidden items-center gap-9 md:flex" aria-label="Main navigation">

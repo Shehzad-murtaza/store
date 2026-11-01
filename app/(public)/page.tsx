@@ -13,12 +13,15 @@ export default async function HomePage() {
 
   return (
     <main>
-      <section className="mx-auto max-w-[1280px] px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8 lg:pt-24">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#666]">A considered collection</p>
-          <h1 className="mt-5 text-4xl font-semibold leading-[1.12] tracking-[-0.045em] text-[#111] sm:text-5xl lg:text-[60px]">Good things, chosen well.</h1>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-[#666] sm:text-lg">Discover a thoughtful edit of pieces for the way you live. A little less, a little better.</p>
-          <Link href="/products" className="mt-8 inline-flex items-center gap-2 rounded-lg bg-[#1a1a1a] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#333] hover:shadow-md">Explore the collection <ArrowRight size={16} /></Link>
+      <section id="home-hero" className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden bg-[#111111] px-4 text-white dark:bg-[#161616] sm:px-6">
+        <span aria-hidden="true" className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden whitespace-nowrap text-[29vw] font-semibold leading-none tracking-[-0.07em] text-white/[0.06]">
+          SHEZY
+        </span>
+        <div className="relative z-10 mx-auto w-full max-w-xl text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/70">SHEZY</p>
+          <h1 className="mt-4 whitespace-nowrap text-[clamp(1.2rem,3.5vw,2.75rem)] font-semibold leading-tight tracking-[-0.045em] text-white">Good things, chosen well.</h1>
+          <p className="mt-3 whitespace-nowrap text-sm leading-6 text-white/70">A small edit of pieces for everyday use.</p>
+          <Link href="/products" className="mt-7 inline-flex h-11 items-center justify-center rounded-full bg-white px-7 text-sm font-medium text-[#111111] transition hover:bg-white/90">Explore</Link>
         </div>
       </section>
 

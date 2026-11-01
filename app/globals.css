@@ -274,3 +274,13 @@ html.dark .login-submit { background: var(--primary) !important; color: var(--pr
 html.dark .admin-sidebar-bottom,
 html.dark .admin-sheet-bottom { border-color: var(--border); }
 html.dark .admin-categories-actions button.text-red-700:hover { background: #351d1b; color: #f0aaa3; }
+
+/* On the dark home hero, keep the existing header controls visible without a bar. */
+.home-hero-header .brand-logo-image { filter: invert(1); }
+.home-hero-header > div > nav a { color: rgb(255 255 255 / 0.72) !important; }
+.home-hero-header > div > nav a[aria-current="page"],
+.home-hero-header > div > nav a:hover { color: #fff !important; }
+.home-hero-header a[href="/admin"] { color: rgb(255 255 255 / 0.82) !important; }
+.home-hero-header a[href="/admin"]:hover { background: rgb(255 255 255 / 0.12) !important; color: #fff !important; }
+.home-hero-header > div > div > button:last-child { color: #fff; }
+.home-hero-header > div > div > button:last-child:hover { background: rgb(255 255 255 / 0.12); }
