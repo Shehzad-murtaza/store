@@ -48,22 +48,13 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getCategoriesWithCounts(): Promise<CategoryWithCount[]> {
   const supabase = await createClient();
-  const [{ data: categories, error: categoryError }, { data: productRows, error: productError }] = await Promise.all([
-    supabase.from("categories").select("*").order("name"),
-    supabase.from("products").select("category_id"),
-  ]);
+  const { data: categories, error: categoryError } = await supabase.from("categories").select("*").order("name");
 
   if (categoryError) throw new Error(`Could not load categories: ${categoryError.message}`);
-  if (productError) throw new Error(`Could not load category counts: ${productError.message}`);
-
-  const counts = new Map<string, number>();
-  for (const row of productRows ?? []) {
-    if (row.category_id) counts.set(row.category_id, (counts.get(row.category_id) ?? 0) + 1);
-  }
-
-  return ((categories ?? []) as Category[]).map((category) => ({
-    ...category,
-    product_count: counts.get(category.id) ?? 0,
+  return Promise.all(((categories ?? []) as Category[]).map(async (category) => {
+    const { count, error } = await supabase.from("products").select("id", { count: "exact", head: true }).eq("category_id", category.id);
+    if (error) throw new Error(`Could not load product count for ${category.name}: ${error.message}`);
+    return { ...category, product_count: count ?? 0 };
   }));
 }
 

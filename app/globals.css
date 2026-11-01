@@ -17,7 +17,7 @@ body { margin: 0; background: var(--background); color: var(--foreground); }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #777; outline-offset: 3px; }
 
 .admin-shell { min-height: 100vh; display: grid; grid-template-columns: 250px minmax(0, 1fr); background: #fafafa; }
-.admin-sidebar { display: flex; flex-direction: column; background: #fff; border-right: 1px solid #eaeaea; padding: 28px 18px; }
+.admin-sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; background: #fff; border-right: 1px solid #eaeaea; padding: 28px 18px; }
 .admin-brand { padding: 0 14px 38px; font-size: 21px; font-weight: 700; letter-spacing: .19em; }
 .admin-label { padding: 0 14px 12px; color: #777; }
 .admin-nav { display: grid; gap: 5px; }
@@ -54,6 +54,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .admin-table td { border-bottom: 1px solid #f0f0f0; padding: 12px 16px; color: #555; vertical-align: middle; }
 .admin-table tbody tr:last-child td { border-bottom: 0; }
 .admin-table tbody tr:hover { background: #fdfdfc; }
+.admin-content.admin-categories-page { max-width: 1100px; margin: 32px auto; }
+.admin-categories-table { min-width: 0; width: 100%; }
+.admin-categories-table th, .admin-categories-table td { white-space: nowrap; }
+.admin-categories-table td { height: 64px; padding-top: 8px; padding-bottom: 8px; }
+.admin-categories-table th:first-child, .admin-categories-table td:first-child { width: 42%; }
+.admin-categories-table th:last-child, .admin-categories-table td:last-child { width: 1%; }
+.admin-topline { align-items: center; }
 .admin-status, .admin-featured { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 500; white-space: nowrap; }
 .admin-status.available { background: #eff4ee; color: #46624a; }
 .admin-status.sold { background: #f1f1f1; color: #666; }
@@ -98,3 +105,133 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .admin-table { min-width: 700px; }
   .login-card { padding: 28px 23px; }
 }
+
+/* Dark theme overrides keep the existing layout and spacing intact. */
+html.dark {
+  color-scheme: dark;
+  --background: #0c0c0c;
+  --surface: #161616;
+  --foreground: #f5f5f5;
+  --secondary: #a3a3a3;
+  --accent: #f5f5f5;
+  --border: #2a2a2a;
+}
+html.dark body { background: var(--background); color: var(--foreground); }
+html.dark ::selection { background: #454545; color: #fff; }
+html.dark [class~="bg-white"],
+html.dark [class~="bg-[#fff]"],
+html.dark [class~="bg-[white]"],
+html.dark [class~="bg-[#fffefa]"] { background-color: #161616 !important; }
+html.dark [class~="bg-[#fafafa]"],
+html.dark [class~="bg-[#fdfdfc]"] { background-color: #0c0c0c !important; }
+html.dark [class*="bg-[#fafafa]/"] { background-color: rgb(12 12 12 / 95%) !important; }
+html.dark [class~="bg-[#f5f5f5]"],
+html.dark [class~="bg-[#f5f5f4]"],
+html.dark [class~="bg-[#f4f4f4]"],
+html.dark [class~="bg-[#f4f4f3]"],
+html.dark [class~="bg-[#f2f2f0]"],
+html.dark [class~="bg-[#f3f3f2]"],
+html.dark [class~="bg-[#f1f1ef]"],
+html.dark [class~="bg-[#f0f0ef]"],
+html.dark [class~="bg-[#eff4ee]"],
+html.dark [class~="bg-[#f3f3f3]"],
+html.dark [class~="bg-[#f2f2f2]"],
+html.dark [class~="bg-[#f0f0f0]"] { background-color: #222 !important; }
+html.dark [class~="text-[#111]"],
+html.dark [class~="text-[#222]"],
+html.dark [class~="text-[#20231f]"],
+html.dark [class~="text-black"] { color: #f5f5f5 !important; }
+html.dark [class~="text-[#333]"],
+html.dark [class~="text-[#444]"],
+html.dark [class~="text-[#555]"],
+html.dark [class~="text-[#666]"],
+html.dark [class~="text-[#777]"] { color: #a3a3a3 !important; }
+html.dark [class~="text-[#888]"],
+html.dark [class~="text-[#999]"] { color: #888 !important; }
+html.dark [class~="border-[#eaeaea]"],
+html.dark [class~="border-[#dedede]"],
+html.dark [class~="border-[#deded6]"],
+html.dark [class~="border-[#f0f0f0]"],
+html.dark [class~="border-[#dcdcd4]"],
+html.dark [class~="border-[#747b5c]"] { border-color: #2a2a2a !important; }
+html.dark [class~="hover:bg-[#f5f5f5]"]:hover,
+html.dark [class~="hover:bg-[#f5f5f4]"]:hover,
+html.dark [class~="hover:bg-[#f3f3f3]"]:hover,
+html.dark [class~="hover:bg-[#f2f2f2]"]:hover,
+html.dark [class~="hover:bg-[#fafafa]"]:hover,
+html.dark [class~="hover:bg-[#f7f7f7]"]:hover,
+html.dark [class~="hover:bg-[#f0f0f0]"]:hover { background-color: #292929 !important; }
+html.dark .admin-shell,
+html.dark .login-page { background: #0c0c0c; color: #f5f5f5; }
+html.dark .admin-sidebar,
+html.dark .admin-sheet,
+html.dark .admin-card,
+html.dark .admin-form-card,
+html.dark .admin-form-section,
+html.dark .admin-table-wrap,
+html.dark .login-card { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .admin-mobile-bar { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .admin-topline,
+html.dark .admin-sidebar-bottom,
+html.dark .admin-sheet > div:last-child { border-color: #2a2a2a; color: #a3a3a3; }
+html.dark .admin-nav a,
+html.dark .admin-toggle,
+html.dark .admin-field,
+html.dark .login-field label,
+html.dark .contact-field { color: #d0d0d0; }
+html.dark .admin-nav a:hover,
+html.dark .admin-nav a.active,
+html.dark .admin-table tbody tr:hover { background: #242424; color: #fff; }
+html.dark .admin-input,
+html.dark .admin-textarea,
+html.dark .admin-select,
+html.dark .login-field input,
+html.dark .contact-input,
+html.dark .contact-textarea { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .admin-upload { background: #1d1d1d; border-color: #363636; color: #ddd; }
+html.dark .admin-upload:hover { background: #262626; }
+html.dark .admin-table th { background: #202020; border-color: #303030; color: #aaa; }
+html.dark .admin-table td { border-color: #2a2a2a; color: #a3a3a3; }
+html.dark .admin-status.available { background: #1c2b20; color: #a8d2ae; }
+html.dark .admin-status.sold { background: #292929; color: #bbb; }
+html.dark .admin-featured { background: #302a1c; color: #d8c58b; }
+html.dark .admin-toggle-track { background: #555; }
+html.dark .admin-toggle input:checked + .admin-toggle-track { background: #eee; }
+html.dark .admin-toggle input:checked + .admin-toggle-track span { background: #111; }
+html.dark .login-error { background: #351d1b; color: #f0aaa3; }
+html.dark [class~="bg-[#f4f8f3]"],
+html.dark [class~="bg-[#f0f4ef]"],
+html.dark [class~="bg-[#f0f4ee]"] { background: #1d281f !important; }
+html.dark [class~="border-[#dfe9df]"] { border-color: #334538 !important; }
+html.dark [class~="text-[#38583d]"],
+html.dark [class~="text-[#45614a]"],
+html.dark [class~="text-[#55705a]"] { color: #a8c6ad !important; }
+html.dark [class~="bg-[#fff7f6]"] { background: #351d1b !important; }
+html.dark [class~="border-[#e4c4c1]"] { border-color: #58312c !important; }
+html.dark [class~="text-[#7c3732]"] { color: #e5a39c !important; }
+html.dark .brand-logo-image { filter: invert(1); }
+html.dark .admin-sheet-overlay { background: #0009; }
+html.dark .admin-sheet { box-shadow: 8px 0 32px #0008; }
+html.dark [class~="bg-[#1a1a1a]"],
+html.dark [class~="bg-[#272a24]"],
+html.dark .login-submit { background-color: #f5f5f5 !important; color: #111 !important; }
+html.dark [class~="hover:bg-[#333]"]:hover,
+html.dark [class~="hover:bg-[#3b3e36]"]:hover { background-color: #e2e2e2 !important; color: #111 !important; }
+html.dark .admin-sidebar { height: 100vh; background: #161616; border-color: #2a2a2a; }
+html.dark .admin-mobile-bar,
+html.dark .admin-sheet { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .admin-table th { background: #1a1a1a; border-color: #2a2a2a; }
+html.dark .admin-table td { border-color: #2a2a2a; }
+html.dark .admin-input,
+html.dark .admin-textarea,
+html.dark .admin-select,
+html.dark .login-field input,
+html.dark .contact-input,
+html.dark .contact-textarea { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .login-theme button,
+html.dark .admin-topline button,
+html.dark .admin-mobile-bar button,
+html.dark .admin-sheet button:not(.login-submit) { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .admin-categories-table tbody tr:hover { background: #1c1c1c; }
+.login-page { position: relative; }
+.login-theme { position: absolute; top: 20px; right: 20px; }

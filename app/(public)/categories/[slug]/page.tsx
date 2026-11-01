@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { EmptyState } from "@/components/catalog/EmptyState";
-import { ProductCard } from "@/components/catalog/ProductCard";
-import { ProductFilters } from "@/components/catalog/ProductFilters";
+import { ProductGridSkeleton, ProductResults } from "@/components/catalog/ProductResults";
+import { ResponsiveProductFilters } from "@/components/catalog/ResponsiveProductFilters";
 import { parseCatalogFilters, type CatalogSearchParams } from "@/lib/catalog/filters";
-import { getCategories, getCategoryBySlug, getProducts } from "@/lib/supabase/catalog";
+import { getCategories, getCategoryBySlug } from "@/lib/supabase/catalog";
 
 type PageProps = { params: Promise<{ slug: string }>; searchParams: Promise<CatalogSearchParams> };
 
@@ -20,16 +20,16 @@ export default async function CategoryDetailPage({ params, searchParams }: PageP
   if (!category) notFound();
 
   const filters = parseCatalogFilters(search);
-  const products = await getProducts({ ...filters, categorySlug: slug, sort: filters.sortValue });
 
-  return <main className="mx-auto min-h-[60vh] max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-    <header className="mb-8 max-w-3xl">
+  return <main className="mx-auto min-h-[60vh] max-w-[1280px] px-4 py-8 sm:px-6 sm:py-11 lg:px-8">
+    <header className="mb-5 max-w-3xl">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Category</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">{category.name}</h1>
       {category.description && <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#666]">{category.description}</p>}
     </header>
-    <div className="mb-7"><ProductFilters categories={categories} filters={filters} action={`/categories/${category.slug}`} showCategory={false} /></div>
-    <div className="mb-5 text-sm text-[#666]">{products.length} {products.length === 1 ? "product" : "products"}</div>
-    {products.length ? <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div> : <EmptyState title="No products match these filters" description="Try changing or clearing the filters to see more from this category." actionHref={`/categories/${category.slug}`} actionLabel="Clear filters" />}
+    <div className="grid items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:gap-8">
+      <ResponsiveProductFilters categories={categories} filters={filters} action={`/categories/${category.slug}`} showCategory={false} />
+      <Suspense fallback={<ProductGridSkeleton />}><ProductResults filters={filters} categorySlug={slug} clearHref={`/categories/${category.slug}`} includeCategory={false} /></Suspense>
+    </div>
   </main>;
 }

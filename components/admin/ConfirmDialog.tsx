@@ -15,6 +15,8 @@ export function ConfirmDialog({
   actionId,
   onSuccess,
   compact = false,
+  ghost = false,
+  buttonClassName = "",
 }: {
   title: string;
   description: string;
@@ -24,6 +26,8 @@ export function ConfirmDialog({
   actionId?: string;
   onSuccess?: () => void;
   compact?: boolean;
+  ghost?: boolean;
+  buttonClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -54,7 +58,7 @@ export function ConfirmDialog({
   }
 
   return <>
-    <button type="button" onClick={() => setOpen(true)} aria-label={title} className={`inline-flex items-center justify-center gap-2 rounded-lg border border-[#eaeaea] text-[#7c3732] transition hover:border-[#e4c4c1] hover:bg-[#fff7f6] ${compact ? "size-9" : "px-3 py-2 text-xs font-medium"}`}>
+    <button type="button" onClick={() => setOpen(true)} aria-label={title} className={`inline-flex items-center justify-center gap-2 rounded-lg transition ${ghost ? "border-0 bg-transparent text-red-700 hover:bg-red-50 hover:text-red-800" : "border border-[#eaeaea] text-[#7c3732] hover:border-[#e4c4c1] hover:bg-[#fff7f6]"} ${compact ? "size-9" : "px-3 py-2 text-xs font-medium"} ${buttonClassName}`}>
       <Trash2 size={15} />{!compact && confirmLabel}
     </button>
     {open && <div className="fixed inset-0 z-[90] grid place-items-center bg-black/35 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) setOpen(false); }}>

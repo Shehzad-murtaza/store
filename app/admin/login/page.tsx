@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LoginForm } from "@/components/admin/login-form";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 export const metadata: Metadata = { title: "Admin sign in" };
 
 export default function AdminLoginPage() {
   return <main className="login-page">
+    <div className="login-theme"><ThemeToggle /></div>
     <section className="login-card">
       <Link href="/" aria-label="SHEZY home" className="login-brand"><BrandLogo width={145} /></Link>
       <h1>Admin sign in</h1>

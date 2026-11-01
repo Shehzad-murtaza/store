@@ -5,6 +5,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 const links = [
   { label: "Home", href: "/" },
@@ -29,6 +30,8 @@ export function Header() {
         <nav className="hidden items-center gap-9 md:flex" aria-label="Main navigation">
           {links.map((link) => <Link key={link.label} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`text-[13px] transition-colors hover:text-black ${isActive(link.href) ? "font-semibold text-[#111]" : "text-[#555]"}`}>{link.label}</Link>)}
         </nav>
+        <div className="flex items-center gap-2">
+        <ThemeToggle />
         <button
           type="button"
           className="inline-flex size-10 items-center justify-center rounded-lg text-[#111] transition hover:bg-[#f0f0f0] md:hidden"
@@ -37,7 +40,7 @@ export function Header() {
           onClick={() => setOpen(!open)}
         >
           {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        </button></div>
       </div>
       {open && <nav className="border-t border-[#eaeaea] bg-white px-4 py-3 md:hidden" aria-label="Mobile navigation">
         <div className="mx-auto grid max-w-[1280px] gap-1 sm:px-2">
