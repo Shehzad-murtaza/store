@@ -27,13 +27,13 @@ export function AdminSidebar({ email }: { email: string }) {
   const [open, setOpen] = useState(false);
 
   return <>
-    <aside className="admin-sidebar">
+    <aside className="admin-sidebar flex h-screen flex-col">
       <Link className="admin-brand" href="/" aria-label="SHEZY home"><BrandLogo width={132} /></Link>
       <div className="admin-label text-[10px] font-semibold uppercase tracking-[0.16em]">Workspace</div>
       <NavLinks />
       <div className="admin-sidebar-bottom">
-        <div className="truncate text-[11px] text-[#777]">{email}</div>
-        <div className="mt-4 grid gap-1">
+        <div className="truncate text-sm text-[#777]" title={email}>{email}</div>
+        <div className="mt-3 grid gap-1">
           <Link href="/" className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-[#555] hover:bg-[#f3f3f3]"><Store size={15} />View storefront</Link>
           <form action={logoutAction}><button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-[#555] hover:bg-[#f3f3f3]"><LogOut size={15} />Sign out</button></form>
         </div>
@@ -46,7 +46,7 @@ export function AdminSidebar({ email }: { email: string }) {
         <div className="mb-7 flex items-center justify-between"><Link href="/" aria-label="SHEZY home" className="inline-flex"><BrandLogo width={132} /></Link><button type="button" onClick={() => setOpen(false)} aria-label="Close admin navigation" className="rounded-lg p-2 text-[#555] hover:bg-[#f2f2f2]"><X size={18} /></button></div>
         <div className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#777]">Workspace</div>
         <NavLinks onNavigate={() => setOpen(false)} />
-        <div className="mt-auto border-t border-[#eaeaea] pt-4"><div className="truncate px-3 text-[11px] text-[#777]">{email}</div><div className="mt-3 grid gap-1"><Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3]"><Store size={15} />View storefront</Link><form action={logoutAction}><button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3]"><LogOut size={15} />Sign out</button></form></div></div>
+        <div className="admin-sheet-bottom mt-auto border-t border-[#eaeaea] px-4 py-4"><div className="truncate text-sm text-[#777]" title={email}>{email}</div><div className="mt-3 grid gap-1"><Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3]"><Store size={15} />View storefront</Link><form action={logoutAction}><button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3]"><LogOut size={15} />Sign out</button></form></div></div>
       </aside>
     </div>}
   </>;

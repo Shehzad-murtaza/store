@@ -94,9 +94,9 @@ export function CategoryForm({ category }: { category?: Category }) {
     }
   }
 
-  return <form onSubmit={handleSubmit} className="space-y-6">
+  return <form onSubmit={handleSubmit} className="w-full space-y-6">
     <input type="hidden" name="id" value={recordId} />
-    <div className="grid gap-5 sm:grid-cols-2">
+    <div className="grid gap-5 md:grid-cols-2">
       <label className="admin-field"><span>Category name <b>*</b></span><Input name="name" required maxLength={120} value={name} onChange={(event) => handleNameChange(event.target.value)} placeholder="For example, Home & living" className="admin-input" /></label>
       <label className="admin-field"><span>Slug <b>*</b></span><Input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" value={slug} onChange={(event) => { setSlugTouched(true); setSlug(event.target.value); }} placeholder="home-living" className="admin-input" /><small>Used in the category page URL.</small></label>
     </div>

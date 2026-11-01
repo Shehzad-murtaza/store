@@ -17,7 +17,7 @@ export default async function EditProductPage({ params }: PageProps) {
   const { id } = await params;
   const [product, categories] = await Promise.all([getProductById(id), getCategories()]);
   if (!product) notFound();
-  return <main className="admin-content max-w-[1000px]">
+  return <main className="admin-content admin-form-page">
     <Link href="/admin/products" className="inline-flex items-center gap-2 text-xs text-[#666] hover:text-black"><ArrowLeft size={14} />Back to products</Link>
     <div className="mb-7 mt-5"><div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Catalogue</div><h1>Edit product</h1><p className="!mt-1">Update product details, pricing, availability, and images.</p></div>
     <ProductForm product={product} categories={categories} images={product.product_images} />

@@ -18,7 +18,7 @@ export default async function EditCategoryPage({ params }: PageProps) {
   const category = await getCategoryById(id);
   if (!category) notFound();
 
-  return <main className="admin-content max-w-[900px]">
+  return <main className="admin-content admin-form-page">
     <Link href="/admin/categories" className="inline-flex items-center gap-2 text-xs text-[#666] hover:text-black"><ArrowLeft size={14} />Back to categories</Link>
     <div className="mb-7 mt-5"><div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Catalogue structure</div><h1>Edit category</h1><p className="!mt-1">Update the details shown across your storefront.</p></div>
     <section className="admin-form-card"><CategoryForm category={category} /></section>

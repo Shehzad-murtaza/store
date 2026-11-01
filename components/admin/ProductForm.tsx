@@ -39,6 +39,7 @@ export function ProductForm({ product, categories, images: initialImages = [] }:
     const primary = initialImages.find((image) => image.is_primary) ?? initialImages[0];
     return primary ? `existing:${primary.id}` : "";
   });
+  const [priceError, setPriceError] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => () => previews.current.forEach((url) => URL.revokeObjectURL(url)), []);
@@ -146,17 +147,17 @@ export function ProductForm({ product, categories, images: initialImages = [] }:
     }
   }
 
-  return <form ref={formRef} onSubmit={handleSubmit} className="space-y-7">
+  return <form ref={formRef} onSubmit={handleSubmit} className="w-full space-y-6">
     <input type="hidden" name="id" value={recordId} />
     <div className="admin-form-section">
       <h2>Product details</h2>
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+      <div className="mt-5 grid gap-5 md:grid-cols-2">
         <label className="admin-field"><span>Product name <b>*</b></span><Input name="name" required maxLength={180} value={name} onChange={(event) => handleNameChange(event.target.value)} placeholder="Product name" className="admin-input" /></label>
         <label className="admin-field"><span>Slug <b>*</b></span><Input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" value={slug} onChange={(event) => { setSlugTouched(true); setSlug(event.target.value); }} placeholder="product-name" className="admin-input" /><small>Used in the product page URL.</small></label>
         <label className="admin-field"><span>Category</span><select name="category_id" defaultValue={product?.category_id ?? ""} className="admin-select"><option value="">Uncategorized</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></label>
         <div className="grid grid-cols-2 gap-4">
-          <label className="admin-field"><span>Price (PKR) <b>*</b></span><Input name="price" type="number" min="0" step="0.01" required defaultValue={product?.price ?? ""} placeholder="0.00" className="admin-input" /></label>
-          <label className="admin-field"><span>Discount (PKR)</span><Input name="discount_price" type="number" min="0" step="0.01" defaultValue={product?.discount_price ?? ""} placeholder="Optional" className="admin-input" /></label>
+          <label className="admin-field"><span>Price (PKR) <b>*</b></span><Input name="price" type="number" min="0" step="0.01" required defaultValue={product?.price ?? ""} placeholder="0" aria-invalid={Boolean(priceError)} aria-describedby={priceError ? "product-price-error" : undefined} onInvalid={() => setPriceError("Price is required.")} onChange={() => setPriceError("")} className="admin-input" />{priceError && <small id="product-price-error" className="field-error" role="alert">{priceError}</small>}</label>
+          <label className="admin-field"><span>Discount (PKR)</span><Input name="discount_price" type="number" min="0" step="0.01" defaultValue={product?.discount_price ?? ""} placeholder="0" className="admin-input" /></label>
         </div>
         <label className="admin-field sm:col-span-2"><span>Description</span><textarea name="description" rows={5} maxLength={5000} defaultValue={product?.description ?? ""} placeholder="Tell customers about this product" className="admin-textarea" /></label>
       </div>

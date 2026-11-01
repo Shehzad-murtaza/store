@@ -114,14 +114,16 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
   const slug = slugify(field(formData, "slug"));
   const description = field(formData, "description");
   const categoryId = field(formData, "category_id");
-  const price = Number(field(formData, "price"));
+  const priceText = field(formData, "price").trim();
+  const price = Number(priceText);
   const discountText = field(formData, "discount_price");
-  const discountPrice = discountText === "" ? null : Number(discountText);
+  const discountValue = discountText.trim() === "" ? null : Number(discountText);
+  const discountPrice = discountValue === 0 ? null : discountValue;
   const primarySelection = field(formData, "primarySelection");
 
   if (!name || name.length > 180) return { ok: false, error: "Enter a product name of 180 characters or fewer." };
   if (!validSlug(slug)) return { ok: false, error: "Enter a valid product slug using letters, numbers, and hyphens." };
-  if (!Number.isFinite(price) || price < 0) return { ok: false, error: "Enter a valid price in PKR." };
+  if (!priceText || !Number.isFinite(price) || price < 0) return { ok: false, error: "Enter a valid price in PKR." };
   if (discountPrice !== null && (!Number.isFinite(discountPrice) || discountPrice < 0 || discountPrice >= price)) {
     return { ok: false, error: "The discount price must be a valid amount below the original price." };
   }
