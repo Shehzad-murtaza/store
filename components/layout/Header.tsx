@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 const links = [
   { label: "Home", href: "/" },
@@ -24,7 +25,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#eaeaea] bg-[#fafafa]/95 backdrop-blur">
       <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-[21px] font-bold tracking-[0.19em] text-[#111]" aria-label="SHEZY home">SHEZY</Link>
+        <Link href="/" aria-label="SHEZY home" className="inline-flex shrink-0 items-center"><BrandLogo width={126} /></Link>
         <nav className="hidden items-center gap-9 md:flex" aria-label="Main navigation">
           {links.map((link) => <Link key={link.label} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`text-[13px] transition-colors hover:text-black ${isActive(link.href) ? "font-semibold text-[#111]" : "text-[#555]"}`}>{link.label}</Link>)}
         </nav>
