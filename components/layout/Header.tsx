@@ -44,12 +44,12 @@ export function Header() {
     <>
     <header className={`glass-site-header fixed inset-x-0 top-0 z-50 border-b ${isHome ? "home-hero-header border-transparent bg-transparent" : "border-[#eaeaea]"}`}>
       <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" aria-label="SHEZY home" className="inline-flex shrink-0 items-center"><BrandLogo width={126} /></Link>
+        <Link href="/" aria-label="SHEZY home" className="public-header-brand inline-flex shrink-0 items-center"><BrandLogo width={126} /></Link>
         <nav className="hidden items-center gap-9 md:flex" aria-label="Main navigation">
           {links.map((link) => <Link key={link.label} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`text-[13px] transition-colors hover:text-black ${isActive(link.href) ? "font-semibold text-[#111]" : "text-[#555]"}`}>{link.label}</Link>)}
         </nav>
-        <div className="flex items-center gap-2">
-        {showDashboard && <Link href="/admin" className="inline-flex h-10 items-center rounded-lg px-3 text-sm font-medium text-[#444] transition-colors hover:bg-[#f0f0f0] hover:text-[#111]">Dashboard</Link>}
+        <div className="public-header-controls flex items-center gap-2">
+        {showDashboard && <Link href="/admin" className="public-header-dashboard inline-flex h-10 items-center rounded-lg px-3 text-sm font-medium text-[#444] transition-colors hover:bg-[#f0f0f0] hover:text-[#111]">Dashboard</Link>}
         <ThemeToggle />
         <button
           type="button"

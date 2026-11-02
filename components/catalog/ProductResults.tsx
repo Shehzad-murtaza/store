@@ -15,8 +15,8 @@ function hasActiveFilters(filters: ParsedCatalogFilters, includeCategory: boolea
 }
 
 export function ProductGridSkeleton() {
-  return <div aria-label="Loading products" className="grid w-full min-w-0 animate-pulse grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-    {Array.from({ length: 6 }, (_, index) => <div key={index} className="overflow-hidden rounded-xl border border-[#eaeaea] bg-white p-3 shadow-sm"><div className="aspect-[4/3] rounded-lg bg-[#f0f0ef]" /><div className="mt-4 h-4 w-2/3 rounded bg-[#eaeaea]" /><div className="mt-3 h-3 w-1/3 rounded bg-[#f0f0f0]" /></div>)}
+  return <div aria-label="Loading products" className="grid w-full min-w-0 animate-pulse grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
+    {Array.from({ length: 6 }, (_, index) => <div key={index} className="overflow-hidden rounded-xl border border-[#eaeaea] bg-white p-2.5 shadow-sm sm:p-3"><div className="aspect-square rounded-lg bg-[#f0f0ef] sm:aspect-[4/3]" /><div className="mt-3 h-4 w-2/3 rounded bg-[#eaeaea]" /><div className="mt-2 h-3 w-1/3 rounded bg-[#f0f0f0]" /></div>)}
   </div>;
 }
 
@@ -40,6 +40,6 @@ export async function ProductResults({ filters, categoryId, categorySlug, clearH
   }
   return <section aria-label="Product results" className="w-full min-w-0">
     <p className="mb-4 text-[13px] text-[#666]">{products.length} {products.length === 1 ? "product" : "products"}</p>
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div>
+    <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div>
   </section>;
 }

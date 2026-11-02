@@ -317,6 +317,11 @@ html.dark .mobile-navigation-panel {
   background: rgb(22 22 22 / 0.86);
   border-color: rgb(255 255 255 / 0.12);
 }
+@media (max-width: 360px) {
+  .public-header-brand .brand-logo-image { width: 96px !important; }
+  .public-header-controls { gap: 4px; }
+  .public-header-dashboard { padding-inline: 8px; font-size: 12px; }
+}
 
 #home-hero { background-color: #f6f6f4; color: #111; }
 #home-hero .home-hero-heading { color: #111; }
