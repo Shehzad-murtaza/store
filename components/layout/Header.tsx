@@ -41,7 +41,8 @@ export function Header() {
   }
 
   return (
-    <header className={isHome ? "home-hero-header sticky top-0 z-50 -mb-[68px] border-b border-transparent bg-transparent" : "sticky top-0 z-50 border-b border-[#eaeaea] bg-[#fafafa]/95 backdrop-blur"}>
+    <>
+    <header className={`glass-site-header fixed inset-x-0 top-0 z-50 border-b ${isHome ? "home-hero-header border-transparent bg-transparent" : "border-[#eaeaea]"}`}>
       <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" aria-label="SHEZY home" className="inline-flex shrink-0 items-center"><BrandLogo width={126} /></Link>
         <nav className="hidden items-center gap-9 md:flex" aria-label="Main navigation">
@@ -60,11 +61,13 @@ export function Header() {
           {open ? <X size={20} /> : <Menu size={20} />}
         </button></div>
       </div>
-      {open && <nav className="border-t border-[#eaeaea] bg-white px-4 py-3 md:hidden" aria-label="Mobile navigation">
+      {open && <nav className="mobile-navigation-panel border-t border-[#eaeaea] px-4 py-3 md:hidden" aria-label="Mobile navigation">
         <div className="mx-auto grid max-w-[1280px] gap-1 sm:px-2">
           {links.map((link) => <Link key={link.label} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} onClick={() => setOpen(false)} className={`rounded-lg px-3 py-3 text-sm transition-colors hover:bg-[#f5f5f5] ${isActive(link.href) ? "bg-[#f5f5f5] font-medium text-[#111]" : "text-[#444]"}`}>{link.label}</Link>)}
         </div>
       </nav>}
     </header>
+    {!isHome && <div aria-hidden="true" className="h-[68px]" />}
+    </>
   );
 }

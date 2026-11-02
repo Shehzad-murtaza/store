@@ -13,24 +13,22 @@ export default async function HomePage() {
 
   return (
     <main>
-      <section id="home-hero" className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden bg-[#111111] px-4 text-white dark:bg-[#161616] sm:px-6">
-        <span aria-hidden="true" className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden whitespace-nowrap text-[29vw] font-semibold leading-none tracking-[-0.07em] text-white/[0.06]">
-          SHEZY
-        </span>
-        <div className="relative z-10 mx-auto w-full max-w-xl text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/70">SHEZY</p>
-          <h1 className="mt-4 whitespace-nowrap text-[clamp(1.2rem,3.5vw,2.75rem)] font-semibold leading-tight tracking-[-0.045em] text-white">Good things, chosen well.</h1>
-          <p className="mt-3 whitespace-nowrap text-sm leading-6 text-white/70">A small edit of pieces for everyday use.</p>
-          <Link href="/products" className="mt-7 inline-flex h-11 items-center justify-center rounded-full bg-white px-7 text-sm font-medium text-[#111111] transition hover:bg-white/90">Explore</Link>
+      <section id="home-hero" className="home-hero relative isolate m-0 flex h-[100svh] items-center justify-center overflow-x-clip bg-[#F6F6F4] px-4 text-[#111111] sm:px-6">
+        <div aria-hidden="true" className="home-hero-glow pointer-events-none absolute left-1/2 top-1/2" />
+        <div className="home-hero-content relative z-10 mx-auto w-full max-w-xl text-center">
+          <p className="home-hero-muted text-xs font-medium uppercase tracking-[0.28em]">SHEZY</p>
+          <h1 className="home-hero-heading mt-4 text-4xl font-semibold leading-tight tracking-tight lg:text-5xl">Good things, chosen well.</h1>
+          <p className="home-hero-muted mt-3 text-base leading-6">A small edit of pieces for everyday use.</p>
+          <Link href="/products" className="home-hero-explore mt-7 inline-flex h-11 items-center justify-center rounded-full px-6 text-sm font-medium">Explore</Link>
         </div>
       </section>
 
-      <section id="featured" className="mx-auto max-w-[1280px] scroll-mt-24 px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-        <div className="mb-7 flex items-end justify-between gap-5">
+      <section id="featured" className="mx-auto max-w-[1280px] scroll-mt-24 px-4 pb-16 pt-20 sm:px-6 sm:pb-20 sm:pt-24 lg:px-8">
+        <div className="mb-6 flex items-end justify-between gap-5">
           <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">The SHEZY edit</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">Featured products</h2></div>
           <Link href="/products" className="hidden items-center gap-1 text-sm font-medium text-[#444] hover:text-black sm:inline-flex">All products <ArrowRight size={15} /></Link>
         </div>
-        {featuredProducts.length ? <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">{featuredProducts.map((product) => <ProductCard product={product} key={product.id} />)}</div> : <EmptyState title="A few good things are on their way" description="Featured pieces will appear here as soon as they are added to the collection." actionHref="/products" actionLabel="Browse all products" />}
+        {featuredProducts.length ? <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">{featuredProducts.map((product) => <ProductCard product={product} key={product.id} />)}</div> : <EmptyState className="home-featured-empty" title="A few good things are on their way" description="Featured pieces will appear here as soon as they are added to the collection." actionHref="/products" actionLabel="Browse all products" />}
       </section>
 
       <section id="categories" className="scroll-mt-24 border-y border-[#eaeaea] bg-white">

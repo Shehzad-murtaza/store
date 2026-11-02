@@ -275,12 +275,81 @@ html.dark .admin-sidebar-bottom,
 html.dark .admin-sheet-bottom { border-color: var(--border); }
 html.dark .admin-categories-actions button.text-red-700:hover { background: #351d1b; color: #f0aaa3; }
 
-/* On the dark home hero, keep the existing header controls visible without a bar. */
-.home-hero-header .brand-logo-image { filter: invert(1); }
-.home-hero-header > div > nav a { color: rgb(255 255 255 / 0.72) !important; }
-.home-hero-header > div > nav a[aria-current="page"],
-.home-hero-header > div > nav a:hover { color: #fff !important; }
-.home-hero-header a[href="/admin"] { color: rgb(255 255 255 / 0.82) !important; }
-.home-hero-header a[href="/admin"]:hover { background: rgb(255 255 255 / 0.12) !important; color: #fff !important; }
-.home-hero-header > div > div > button:last-child { color: #fff; }
-.home-hero-header > div > div > button:last-child:hover { background: rgb(255 255 255 / 0.12); }
+/* Theme-aware frosted glass treatment for the public storefront header. */
+.glass-site-header {
+  background: rgb(250 250 250 / 0.74);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border-bottom-color: rgb(234 234 234 / 0.72);
+}
+html.dark .glass-site-header {
+  background: rgb(12 12 12 / 0.74);
+  border-bottom-color: rgb(255 255 255 / 0.12);
+}
+.home-hero-header { background: rgb(246 246 244 / 0.62); }
+html.dark .home-hero-header { background: rgb(12 12 12 / 0.62); }
+.home-hero-header .brand-logo-image { filter: none; }
+html.dark .home-hero-header .brand-logo-image { filter: invert(1); }
+html:not(.dark) .home-hero-header nav a,
+html:not(.dark) .home-hero-header a[href="/admin"] { color: #111 !important; }
+html:not(.dark) .home-hero-header nav a:hover,
+html:not(.dark) .home-hero-header a[href="/admin"]:hover { color: #111 !important; }
+html.dark .home-hero-header nav a,
+html.dark .home-hero-header a[href="/admin"] { color: #fff !important; }
+html.dark .home-hero-header nav a:hover,
+html.dark .home-hero-header a[href="/admin"]:hover { color: #fff !important; }
+.home-hero-header button[aria-label="Toggle color theme"] { background: transparent; border-color: #e5e5e5; color: #111; }
+.home-hero-header button[aria-label="Toggle color theme"]:hover { background: rgb(17 17 17 / 0.05); }
+html.dark .home-hero-header button[aria-label="Toggle color theme"] { background: transparent !important; border-color: rgb(255 255 255 / 0.2) !important; color: #fff !important; }
+html.dark .home-hero-header button[aria-label="Toggle color theme"]:hover { background: rgb(255 255 255 / 0.08) !important; }
+html:not(.dark) .home-hero-header > div > div > button:last-child { color: #111; }
+html.dark .home-hero-header > div > div > button:last-child { color: #fff; }
+html:not(.dark) .home-hero-header a[href="/admin"]:hover { background: rgb(17 17 17 / 0.06) !important; }
+html.dark .home-hero-header a[href="/admin"]:hover { background: rgb(255 255 255 / 0.12) !important; }
+
+.mobile-navigation-panel {
+  background: rgb(255 255 255 / 0.86);
+  backdrop-filter: blur(18px);
+  border-color: rgb(234 234 234 / 0.8);
+}
+html.dark .mobile-navigation-panel {
+  background: rgb(22 22 22 / 0.86);
+  border-color: rgb(255 255 255 / 0.12);
+}
+
+#home-hero { background-color: #f6f6f4; color: #111; }
+#home-hero .home-hero-heading { color: #111; }
+#home-hero .home-hero-muted { color: #525252; }
+#home-hero .home-hero-explore { background-color: #111; color: #fff; }
+html.dark #home-hero { background-color: #0c0c0c; color: #fff; }
+html.dark #home-hero .home-hero-heading { color: #fff; }
+html.dark #home-hero .home-hero-muted { color: rgb(255 255 255 / 0.7); }
+html.dark #home-hero .home-hero-explore { background-color: #fff; color: #111; }
+
+#featured { background-color: #fafafa; }
+html.dark #featured { background-color: #0c0c0c; }
+#featured .home-featured-empty { border: 1px solid #eaeaea; border-style: solid; background: #fff; color: #111; }
+#featured .home-featured-empty > span:first-child { border: 1px solid #eaeaea; background: #f5f5f4; color: #525252; }
+html.dark #featured .home-featured-empty { border-color: #2a2a2a; background: #161616; color: #f5f5f5; }
+html.dark #featured .home-featured-empty > span:first-child { border-color: #303030; background: #202020; color: #f5f5f5; }
+
+.home-hero-glow {
+  width: min(480px, 120vw);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(0 0 0 / 0.04), transparent 70%);
+  filter: blur(64px);
+  transform: translate(-50%, -50%);
+}
+html.dark .home-hero-glow { background: radial-gradient(circle, rgb(255 255 255 / 0.04), transparent 70%); }
+.home-hero-content > :nth-child(1) { animation: shezy-hero-reveal 700ms ease-out 0ms both; }
+.home-hero-content > :nth-child(2) { animation: shezy-hero-reveal 700ms ease-out 80ms both; }
+.home-hero-content > :nth-child(3) { animation: shezy-hero-reveal 700ms ease-out 160ms both; }
+.home-hero-content > :nth-child(4) { animation: shezy-hero-reveal 700ms ease-out 240ms both; }
+@keyframes shezy-hero-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-content > * { animation: none !important; opacity: 1; transform: none; }
+}
