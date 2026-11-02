@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { CategoryCard } from "@/components/catalog/CategoryCard";
@@ -5,12 +6,7 @@ import { EmptyState } from "@/components/catalog/EmptyState";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { getCategoriesWithCounts, getProducts } from "@/lib/supabase/catalog";
 
-export default async function HomePage() {
-  const [featuredProducts, categories] = await Promise.all([
-    getProducts({ featuredOnly: true, sort: "newest", limit: 4 }),
-    getCategoriesWithCounts(),
-  ]);
-
+export default function HomePage() {
   return (
     <main>
       <section id="home-hero" className="home-hero relative isolate m-0 flex h-[100svh] items-center justify-center overflow-x-clip bg-[#F6F6F4] px-4 text-[#111111] sm:px-6">
@@ -22,24 +18,60 @@ export default async function HomePage() {
           <Link href="/products" className="home-hero-explore mt-7 inline-flex h-11 items-center justify-center rounded-full px-6 text-sm font-medium">Explore</Link>
         </div>
       </section>
-
-      <section id="featured" className="mx-auto max-w-[1280px] scroll-mt-24 px-4 pb-16 pt-20 sm:px-6 sm:pb-20 sm:pt-24 lg:px-8">
-        <div className="mb-5 flex items-end justify-between gap-3 sm:mb-6 sm:gap-5">
-          <div><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#777] sm:text-xs">The SHEZY edit</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] sm:text-3xl">Featured products</h2></div>
-          <Link href="/products" className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-[#444] hover:text-black sm:text-sm">All products <ArrowRight size={15} /></Link>
-        </div>
-        {featuredProducts.length ? <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">{featuredProducts.map((product) => <ProductCard product={product} key={product.id} />)}</div> : <EmptyState className="home-featured-empty" title="A few good things are on their way" description="Featured pieces will appear here as soon as they are added to the collection." actionHref="/products" actionLabel="Browse all products" />}
-      </section>
-
-      <section id="categories" className="scroll-mt-24 border-y border-[#eaeaea] bg-white">
-        <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <div className="mb-5 flex items-end justify-between gap-3 sm:mb-7 sm:gap-5">
-            <div><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#777] sm:text-xs">Browse the collection</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] sm:text-3xl">Categories</h2></div>
-            <Link href="/categories" className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-[#444] hover:text-black sm:text-sm">All categories <ArrowRight size={15} /></Link>
-          </div>
-          {categories.length ? <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">{categories.slice(0, 6).map((category) => <CategoryCard category={category} key={category.id} />)}</div> : <EmptyState title="Our categories are taking shape" description="New collections will appear here as the catalogue grows." actionHref="/categories" actionLabel="View categories" />}
-        </div>
-      </section>
+      <Suspense fallback={<FeaturedProductsFallback />}><FeaturedProductsSection /></Suspense>
+      <Suspense fallback={<CategoriesFallback />}><CategoriesSection /></Suspense>
     </main>
   );
+}
+
+function FeaturedSectionHeading() {
+  return <div className="mb-5 flex items-end justify-between gap-3 sm:mb-6 sm:gap-5">
+    <div><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#777] sm:text-xs">The SHEZY edit</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] sm:text-3xl">Featured products</h2></div>
+    <Link href="/products" className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-[#444] hover:text-black sm:text-sm">All products <ArrowRight size={15} /></Link>
+  </div>;
+}
+
+async function FeaturedProductsSection() {
+  const products = await getProducts({ featuredOnly: true, sort: "newest", limit: 4 });
+  return <section id="featured" className="mx-auto max-w-[1280px] scroll-mt-24 px-4 pb-16 pt-20 sm:px-6 sm:pb-20 sm:pt-24 lg:px-8">
+    <FeaturedSectionHeading />
+    {products.length ? <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">{products.map((product) => <ProductCard product={product} key={product.id} />)}</div> : <EmptyState className="home-featured-empty" title="A few good things are on their way" description="Featured pieces will appear here as soon as they are added to the collection." actionHref="/products" actionLabel="Browse all products" />}
+  </section>;
+}
+
+function FeaturedProductsFallback() {
+  return <section id="featured" className="mx-auto max-w-[1280px] scroll-mt-24 px-4 pb-16 pt-20 sm:px-6 sm:pb-20 sm:pt-24 lg:px-8">
+    <FeaturedSectionHeading />
+    <div aria-label="Loading featured products" className="grid grid-cols-2 gap-3 animate-pulse sm:gap-5 lg:grid-cols-4">
+      {Array.from({ length: 4 }, (_, index) => <div key={index} className="overflow-hidden rounded-xl border border-[#eaeaea] bg-white p-2.5 shadow-sm sm:p-3"><div className="aspect-square rounded-lg bg-[#f0f0ef] sm:aspect-[4/3]" /><div className="mt-3 h-4 w-2/3 rounded bg-[#eaeaea]" /><div className="mt-2 h-3 w-1/3 rounded bg-[#f0f0f0]" /></div>)}
+    </div>
+  </section>;
+}
+
+function CategoriesHeading() {
+  return <div className="mb-5 flex items-end justify-between gap-3 sm:mb-7 sm:gap-5">
+    <div><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#777] sm:text-xs">Browse the collection</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] sm:text-3xl">Categories</h2></div>
+    <Link href="/categories" className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-[#444] hover:text-black sm:text-sm">All categories <ArrowRight size={15} /></Link>
+  </div>;
+}
+
+async function CategoriesSection() {
+  const categories = await getCategoriesWithCounts();
+  return <section id="categories" className="scroll-mt-24 border-y border-[#eaeaea] bg-white">
+    <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <CategoriesHeading />
+      {categories.length ? <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">{categories.slice(0, 6).map((category) => <CategoryCard category={category} key={category.id} />)}</div> : <EmptyState title="Our categories are taking shape" description="New collections will appear here as the catalogue grows." actionHref="/categories" actionLabel="View categories" />}
+    </div>
+  </section>;
+}
+
+function CategoriesFallback() {
+  return <section id="categories" className="scroll-mt-24 border-y border-[#eaeaea] bg-white">
+    <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <CategoriesHeading />
+      <div aria-label="Loading categories" className="grid grid-cols-2 gap-3 animate-pulse sm:gap-4 lg:grid-cols-3">
+        {Array.from({ length: 4 }, (_, index) => <div key={index} className="overflow-hidden rounded-xl border border-[#eaeaea] bg-white p-2.5 shadow-sm sm:p-3"><div className="aspect-[4/3] rounded-lg bg-[#f0f0ef] sm:aspect-[5/3]" /><div className="mt-3 h-4 w-2/3 rounded bg-[#eaeaea]" /><div className="mt-2 h-3 w-1/3 rounded bg-[#f0f0f0]" /></div>)}
+      </div>
+    </div>
+  </section>;
 }

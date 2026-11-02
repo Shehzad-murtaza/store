@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/catalog/slug";
@@ -18,6 +19,10 @@ function field(formData: FormData, key: string): string {
 
 function validSlug(value: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
+}
+
+function refreshCatalogCache() {
+  revalidateTag("catalog");
 }
 
 function storagePathFromUrl(url: string | null): string | null {
@@ -64,6 +69,7 @@ export async function saveCategory(formData: FormData): Promise<AdminActionResul
 
   if (result.error) return { ok: false, error: result.error.message.includes("categories_slug_key") ? "That slug is already in use." : result.error.message };
   if (!result.data) return { ok: false, error: "Category not found." };
+  refreshCatalogCache();
   return { ok: true, id: result.data.id };
 }
 
@@ -80,6 +86,7 @@ export async function setCategoryImage(categoryId: string, path: string): Promis
   if (error) return { ok: false, error: error.message };
 
   const cleanupWarning = await removeStoragePaths([storagePathFromUrl(category.image_url)]);
+  refreshCatalogCache();
   return { ok: true, warning: cleanupWarning ? "Category saved, but its previous image could not be removed from storage." : undefined };
 }
 
@@ -91,6 +98,7 @@ export async function removeCategoryImage(categoryId: string): Promise<AdminActi
   const { error } = await supabase.from("categories").update({ image_url: null }).eq("id", categoryId);
   if (error) return { ok: false, error: error.message };
   const cleanupWarning = await removeStoragePaths([storagePathFromUrl(category.image_url)]);
+  refreshCatalogCache();
   return { ok: true, warning: cleanupWarning ? "Image removed from the category, but its file could not be removed from storage." : undefined };
 }
 
@@ -103,6 +111,7 @@ export async function deleteCategory(categoryId: string): Promise<AdminActionRes
   const { error } = await supabase.from("categories").delete().eq("id", categoryId);
   if (error) return { ok: false, error: error.message };
   const cleanupWarning = await removeStoragePaths([storagePathFromUrl(category.image_url)]);
+  refreshCatalogCache();
   return { ok: true, warning: cleanupWarning ? "Category deleted, but its image could not be removed from storage." : undefined };
 }
 
@@ -159,6 +168,7 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
     if (primaryError) return { ok: false, error: primaryError.message };
   }
 
+  refreshCatalogCache();
   return { ok: true, id: productId };
 }
 
@@ -185,6 +195,7 @@ export async function addProductImages(productId: string, paths: string[], prima
     }
   }
 
+  refreshCatalogCache();
   return { ok: true };
 }
 
@@ -200,6 +211,7 @@ export async function deleteProductImage(imageId: string): Promise<AdminActionRe
     if (replacement) await supabase.from("product_images").update({ is_primary: true }).eq("id", replacement.id);
   }
   const cleanupWarning = await removeStoragePaths([storagePathFromUrl(image.image_url)]);
+  refreshCatalogCache();
   return { ok: true, warning: cleanupWarning ? "Image record deleted, but its file could not be removed from storage." : undefined };
 }
 
@@ -211,5 +223,6 @@ export async function deleteProduct(productId: string): Promise<AdminActionResul
   const { error } = await supabase.from("products").delete().eq("id", productId);
   if (error) return { ok: false, error: error.message };
   const cleanupWarning = await removeStoragePaths((images ?? []).map((image) => storagePathFromUrl(image.image_url)));
+  refreshCatalogCache();
   return { ok: true, warning: cleanupWarning ? "Product deleted, but one or more image files could not be removed from storage." : undefined };
 }

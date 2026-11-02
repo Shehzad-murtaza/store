@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ImageIcon, ArrowUpRight } from "lucide-react";
-import type { ProductWithCatalogData } from "@/lib/supabase/catalog";
+import type { ProductCardData } from "@/lib/supabase/catalog";
 import { formatPKR } from "@/lib/catalog/format";
 
-export function ProductCard({ product }: { product: ProductWithCatalogData }) {
+export function ProductCard({ product }: { product: ProductCardData }) {
   const hasDiscount = product.discount_price !== null;
 
   return (

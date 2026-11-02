@@ -19,15 +19,16 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
   const categoryId = first(search.category);
   const status = first(search.status);
   const featured = first(search.featured) === "true";
-  const [categories, allProducts] = await Promise.all([getCategories(), getProducts({ sort: "newest" })]);
-  const products = allProducts.filter((product) => {
-    if (query && !`${product.name} ${product.slug}`.toLowerCase().includes(query)) return false;
-    if (categoryId && product.category_id !== categoryId) return false;
-    if (status === "sold" && !product.is_sold) return false;
-    if (status === "in_stock" && product.is_sold) return false;
-    if (featured && !product.is_featured) return false;
-    return true;
-  });
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts({
+      sort: "newest",
+      categoryId: categoryId || undefined,
+      availability: status === "sold" || status === "in_stock" ? status : undefined,
+      featuredOnly: featured,
+      searchTerm: query || undefined,
+    }),
+  ]);
 
   return <main className="admin-content admin-products-page">
     <header className="mb-6">
