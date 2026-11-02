@@ -317,6 +317,34 @@ html.dark .mobile-navigation-panel {
   background: rgb(22 22 22 / 0.86);
   border-color: rgb(255 255 255 / 0.12);
 }
+.gallery-nav-button {
+  border-color: rgb(234 234 234 / 0.9);
+  background: rgb(255 255 255 / 0.94);
+  color: #111;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.gallery-nav-button:hover { background: #fff; }
+.gallery-count-pill {
+  border-color: rgb(234 234 234 / 0.8);
+  background: rgb(255 255 255 / 0.9);
+  color: #333;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+html.dark .gallery-nav-button {
+  border-color: rgb(255 255 255 / 0.18);
+  background: rgb(22 22 22 / 0.88);
+  color: #f5f5f5;
+}
+html.dark .gallery-nav-button:hover { background: rgb(36 36 36 / 0.96); }
+html.dark .gallery-count-pill {
+  border-color: rgb(255 255 255 / 0.14);
+  background: rgb(22 22 22 / 0.82);
+  color: #f5f5f5;
+}
+.product-gallery-thumbnails { scrollbar-width: thin; scrollbar-color: #c7c7c7 transparent; }
+html.dark .product-gallery-thumbnails { scrollbar-color: #555 transparent; }
 @media (max-width: 360px) {
   .public-header-brand .brand-logo-image { width: 96px !important; }
   .public-header-controls { gap: 4px; }
