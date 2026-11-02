@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ProductGridSkeleton, ProductResults } from "@/components/catalog/ProductResults";
 import { ResponsiveProductFilters } from "@/components/catalog/ResponsiveProductFilters";
+import { PublicBackButton } from "@/components/layout/PublicBackButton";
 import { parseCatalogFilters, type CatalogSearchParams } from "@/lib/catalog/filters";
 import { getCategoryBySlug } from "@/lib/supabase/catalog";
 
@@ -22,6 +23,7 @@ export default async function CategoryDetailPage({ params, searchParams }: PageP
   const filters = parseCatalogFilters(search);
 
   return <main className="mx-auto min-h-[60vh] max-w-[1280px] px-4 py-7 sm:px-6 sm:py-11 lg:px-8">
+    <div className="mb-5 sm:mb-6"><PublicBackButton fallbackHref="/categories" /></div>
     <header className="mb-5 max-w-3xl sm:mb-6">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Category</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">{category.name}</h1>

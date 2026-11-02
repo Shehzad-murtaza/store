@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { WhatsAppButton } from "@/components/catalog/WhatsAppButton";
+import { PublicBackButton } from "@/components/layout/PublicBackButton";
 import { formatPKR } from "@/lib/catalog/format";
 import { getProductBySlug, getProducts } from "@/lib/supabase/catalog";
 
@@ -27,11 +28,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const currentPrice = hasDiscount ? product.discount_price! : product.price;
 
   return <main className="mx-auto w-full max-w-[1280px] px-4 pb-12 pt-5 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8">
-    <nav aria-label="Breadcrumb" className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-[#777] sm:mb-6 sm:text-xs">
-      <Link href="/products" className="hover:text-[#111]">Products</Link><span aria-hidden="true">/</span>
+    <div className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 sm:mb-6">
+      <PublicBackButton fallbackHref="/products" />
+      <nav aria-label="Breadcrumb" className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-[#777] sm:text-xs">
+        <Link href="/products" className="hover:text-[#111]">Products</Link><span aria-hidden="true">/</span>
       {product.category && <><Link href={`/categories/${product.category.slug}`} className="hover:text-[#111]">{product.category.name}</Link><span aria-hidden="true">/</span></>}
-      <span className="text-[#444]">{product.name}</span>
-    </nav>
+        <span className="max-w-full truncate text-[#444]">{product.name}</span>
+      </nav>
+    </div>
 
     <div className="grid min-w-0 gap-5 sm:gap-8 lg:grid-cols-2 lg:items-start lg:gap-12">
       <ProductGallery images={product.product_images} productName={product.name} />
