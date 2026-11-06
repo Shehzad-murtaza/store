@@ -142,7 +142,7 @@ async function FeaturedProductsSection() {
         <div className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6 lg:px-8">
           <FeaturedSectionHeading />
           {products.length ? (
-            <div className={`catalog-product-grid mx-auto w-full gap-4 sm:gap-6 ${products.length === 1 ? "max-w-md" : products.length < 4 ? "max-w-3xl" : ""}`}>
+            <div className={`home-featured-grid home-featured-grid-${Math.min(products.length, 4)} mx-auto w-full gap-4 sm:gap-6 ${products.length === 1 ? "max-w-[340px]" : products.length === 2 ? "max-w-3xl" : products.length === 3 ? "max-w-4xl" : "max-w-full"}`}>
               {products.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
           ) : (
@@ -164,7 +164,7 @@ function FeaturedProductsFallback() {
     <section id="featured" className="bg-[#fafafa]">
       <div className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6 lg:px-8">
         <FeaturedSectionHeading />
-        <div aria-label="Loading featured products" className="catalog-product-grid animate-pulse gap-4 sm:gap-6">
+        <div aria-label="Loading featured products" className="home-featured-grid home-featured-grid-4 animate-pulse gap-4 sm:gap-6">
           {Array.from({ length: 4 }, (_, index) => (
             <div key={index} className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
               <div className="aspect-square rounded-xl bg-gray-100" />

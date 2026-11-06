@@ -45,7 +45,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
           {product.discount_price !== null && <span className="text-xs text-[#888] line-through">{formatPKR(product.price)}</span>}
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <AddToCartButton product={cartProduct} compact className="min-w-0 flex-1" label="Add to cart" />
+          <AddToCartButton product={cartProduct} compact className="product-card-cart min-w-0 flex-1" label="Add to cart" />
           <WishlistButton item={cartProduct} className="wishlist-card-button" size={16} />
         </div>
       </div>

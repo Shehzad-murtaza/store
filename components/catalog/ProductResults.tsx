@@ -17,7 +17,7 @@ function hasActiveFilters(filters: ParsedCatalogFilters, includeCategory: boolea
 
 export function ProductGridSkeleton() {
   return (
-    <div aria-label="Loading products" className="catalog-product-grid w-full min-w-0 animate-pulse gap-3 sm:gap-5">
+    <div aria-label="Loading products" className="catalog-product-grid catalog-product-grid--dense w-full min-w-0 animate-pulse gap-3 sm:gap-5">
       {Array.from({ length: 6 }, (_, index) => (
         <div key={index} className="overflow-hidden rounded-xl border border-[#eaeaea] bg-white p-2.5 shadow-sm sm:p-3">
           <div className="aspect-square rounded-lg bg-[#f0f0ef]" />
@@ -54,7 +54,7 @@ export async function ProductResults({ filters, categoryId, categorySlug, clearH
   return (
     <section aria-label="Product results" className="w-full min-w-0">
       <p className="mb-4 text-[13px] text-[#666]">{products.length} {products.length === 1 ? "product" : "products"}</p>
-      <div className="catalog-product-grid gap-3 sm:gap-5">
+      <div className={`catalog-product-grid gap-3 sm:gap-5 ${products.length >= 3 ? "catalog-product-grid--dense" : ""}`}>
         {products.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
     </section>

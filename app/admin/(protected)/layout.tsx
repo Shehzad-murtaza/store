@@ -9,26 +9,26 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
   const user = await requireAdmin();
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="admin-layout-shell flex h-dvh min-w-0 w-full flex-col overflow-hidden">
       {/* Sidebar - Fix height to screen */}
       <AdminSidebar email={user.email ?? "Administrator"} />
       
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-y-auto relative">
+      <div className="relative flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-y-auto md:h-full">
         
         {/* Topline Header - Fixed alignment with no top margin */}
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-[#333] px-6 py-4 sticky top-0 bg-white dark:bg-[#111] z-10">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-[#333] dark:bg-[#111] sm:px-6 sm:py-4">
+          <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
             Store administration
           </span>
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <span>Pakistan · PKR</span>
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 sm:gap-4 sm:text-sm">
+            <span className="hidden sm:inline">Pakistan · PKR</span>
             <ThemeToggle />
           </div>
         </div>
         
         {/* Page Content Wrapper */}
-        <div className="flex-1 p-6 md:p-8">
+        <div className="min-w-0 flex-1 p-4 sm:p-6 md:p-8">
           <ToastProvider>{children}</ToastProvider>
         </div>
         
