@@ -8,6 +8,7 @@ import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { CartButton } from "@/components/cart/CartButton";
 import { WishlistHeaderButton } from "@/components/wishlist/WishlistHeaderButton";
+import { AccountHeaderButton } from "@/components/account/AccountHeaderButton";
 import { createClient } from "@/lib/supabase/client";
 
 const links = [
@@ -26,15 +27,34 @@ export function Header() {
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled = false;
+
+    // Only the store owner should see the admin dashboard link.
+    async function resolveAdmin(userId: string | undefined): Promise<boolean> {
+      if (!userId) return false;
+      const { data } = await supabase.rpc("is_admin");
+      return Boolean(data);
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       authEventRevision.current += 1;
-      setShowDashboard(event !== "SIGNED_OUT" && Boolean(session?.user));
+      const revision = authEventRevision.current;
+      if (event === "SIGNED_OUT" || !session?.user) {
+        setShowDashboard(false);
+        return;
+      }
+      void resolveAdmin(session.user.id).then((isAdmin) => {
+        if (!cancelled && authEventRevision.current === revision) setShowDashboard(isAdmin);
+      });
     });
+
     const revisionAtRequest = authEventRevision.current;
-    void supabase.auth.getUser().then(({ data: { user } }) => {
-      if (authEventRevision.current === revisionAtRequest) setShowDashboard(Boolean(user));
+    void supabase.auth.getUser().then(async ({ data: { user } }) => {
+      const isAdmin = await resolveAdmin(user?.id);
+      if (!cancelled && authEventRevision.current === revisionAtRequest) setShowDashboard(isAdmin);
     });
-    return () => subscription.unsubscribe();
+
+    return () => { cancelled = true; subscription.unsubscribe(); };
   }, []);
 
   function isActive(href: string) {
@@ -52,6 +72,7 @@ export function Header() {
         </nav>
         <div className="public-header-controls flex items-center gap-2">
         {showDashboard && <Link href="/admin" className="public-header-dashboard inline-flex h-10 items-center rounded-lg px-3 text-sm font-medium text-[#444] transition-colors hover:bg-[#f0f0f0] hover:text-[#111]">Dashboard</Link>}
+        <AccountHeaderButton />
         <WishlistHeaderButton />
         <CartButton />
         <ThemeToggle />

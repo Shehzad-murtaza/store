@@ -32,26 +32,26 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const isLoginPath = pathname === "/admin/login";
 
-  if (isAdminPath && isLoginPath && user) {
+  function redirectTo(targetPath: string, nextValue?: string) {
     const destination = request.nextUrl.clone();
-    destination.pathname = "/admin";
+    destination.pathname = targetPath;
     destination.search = "";
+    if (nextValue) destination.searchParams.set("next", nextValue);
     const redirectResponse = NextResponse.redirect(destination);
     response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
     return redirectResponse;
   }
 
-  if (isAdminPath && !isLoginPath && !user) {
-    const destination = request.nextUrl.clone();
-    destination.pathname = "/admin/login";
-    destination.search = "";
-    destination.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
-    const redirectResponse = NextResponse.redirect(destination);
-    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
-    return redirectResponse;
+  if (user) {
+    // Signing in is not enough; admin routes belong to the store owner only.
+    const { data: isAdmin } = await supabase.rpc("is_admin");
+    if (!isAdmin) return redirectTo("/");
+    if (isLoginPath) return redirectTo("/admin");
+  } else if (!isLoginPath) {
+    return redirectTo("/admin/login", `${pathname}${request.nextUrl.search}`);
   }
 
-  if (isAdminPath && !isLoginPath) {
+  if (!isLoginPath) {
     response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
   }
   return response;

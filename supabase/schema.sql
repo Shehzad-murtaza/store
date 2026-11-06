@@ -13,6 +13,39 @@ begin
 end;
 $$;
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Admin vs customer separation. Supabase Auth is shared by the store owner and
+-- storefront customers, so management access is gated by an explicit allowlist
+-- instead of "any signed-in user".
+-- ─────────────────────────────────────────────────────────────────────────────
+
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+alter table public.admin_users enable row level security;
+
+-- One-time seed: the account that already existed before customers could sign up
+-- is treated as the store owner. Runs only while the allowlist is still empty,
+-- so later customer sign-ups are never promoted.
+insert into public.admin_users (user_id)
+select id from auth.users u
+where not exists (select 1 from public.admin_users)
+order by u.created_at
+limit 1
+on conflict (user_id) do nothing;
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (select 1 from public.admin_users a where a.user_id = auth.uid());
+$$;
+
 create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -70,40 +103,49 @@ drop policy if exists "Public can read categories" on public.categories;
 create policy "Public can read categories" on public.categories
   for select to anon, authenticated using (true);
 drop policy if exists "Authenticated users can insert categories" on public.categories;
-create policy "Authenticated users can insert categories" on public.categories
-  for insert to authenticated with check (auth.uid() is not null);
+drop policy if exists "Admins can insert categories" on public.categories;
+create policy "Admins can insert categories" on public.categories
+  for insert to authenticated with check (public.is_admin());
 drop policy if exists "Authenticated users can update categories" on public.categories;
-create policy "Authenticated users can update categories" on public.categories
-  for update to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+drop policy if exists "Admins can update categories" on public.categories;
+create policy "Admins can update categories" on public.categories
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
 drop policy if exists "Authenticated users can delete categories" on public.categories;
-create policy "Authenticated users can delete categories" on public.categories
-  for delete to authenticated using (auth.uid() is not null);
+drop policy if exists "Admins can delete categories" on public.categories;
+create policy "Admins can delete categories" on public.categories
+  for delete to authenticated using (public.is_admin());
 
 drop policy if exists "Public can read products" on public.products;
 create policy "Public can read products" on public.products
   for select to anon, authenticated using (true);
 drop policy if exists "Authenticated users can insert products" on public.products;
-create policy "Authenticated users can insert products" on public.products
-  for insert to authenticated with check (auth.uid() is not null);
+drop policy if exists "Admins can insert products" on public.products;
+create policy "Admins can insert products" on public.products
+  for insert to authenticated with check (public.is_admin());
 drop policy if exists "Authenticated users can update products" on public.products;
-create policy "Authenticated users can update products" on public.products
-  for update to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+drop policy if exists "Admins can update products" on public.products;
+create policy "Admins can update products" on public.products
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
 drop policy if exists "Authenticated users can delete products" on public.products;
-create policy "Authenticated users can delete products" on public.products
-  for delete to authenticated using (auth.uid() is not null);
+drop policy if exists "Admins can delete products" on public.products;
+create policy "Admins can delete products" on public.products
+  for delete to authenticated using (public.is_admin());
 
 drop policy if exists "Public can read product images" on public.product_images;
 create policy "Public can read product images" on public.product_images
   for select to anon, authenticated using (true);
 drop policy if exists "Authenticated users can insert product images" on public.product_images;
-create policy "Authenticated users can insert product images" on public.product_images
-  for insert to authenticated with check (auth.uid() is not null);
+drop policy if exists "Admins can insert product images" on public.product_images;
+create policy "Admins can insert product images" on public.product_images
+  for insert to authenticated with check (public.is_admin());
 drop policy if exists "Authenticated users can update product images" on public.product_images;
-create policy "Authenticated users can update product images" on public.product_images
-  for update to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+drop policy if exists "Admins can update product images" on public.product_images;
+create policy "Admins can update product images" on public.product_images
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
 drop policy if exists "Authenticated users can delete product images" on public.product_images;
-create policy "Authenticated users can delete product images" on public.product_images
-  for delete to authenticated using (auth.uid() is not null);
+drop policy if exists "Admins can delete product images" on public.product_images;
+create policy "Admins can delete product images" on public.product_images
+  for delete to authenticated using (public.is_admin());
 
 -- Public image delivery; only signed-in users can upload or delete objects.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -117,11 +159,13 @@ drop policy if exists "Public can view product images" on storage.objects;
 create policy "Public can view product images" on storage.objects
   for select to anon, authenticated using (bucket_id = 'product-images');
 drop policy if exists "Authenticated users can upload product images" on storage.objects;
-create policy "Authenticated users can upload product images" on storage.objects
-  for insert to authenticated with check (bucket_id = 'product-images' and auth.uid() is not null);
+drop policy if exists "Admins can upload product images" on storage.objects;
+create policy "Admins can upload product images" on storage.objects
+  for insert to authenticated with check (bucket_id = 'product-images' and public.is_admin());
 drop policy if exists "Authenticated users can delete product images" on storage.objects;
-create policy "Authenticated users can delete product images" on storage.objects
-  for delete to authenticated using (bucket_id = 'product-images' and auth.uid() is not null);
+drop policy if exists "Admins can delete product images" on storage.objects;
+create policy "Admins can delete product images" on storage.objects
+  for delete to authenticated using (bucket_id = 'product-images' and public.is_admin());
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Storefront orders and stock tracking.
@@ -175,6 +219,11 @@ create table if not exists public.order_items (
   line_total numeric(12, 2) not null
 );
 
+-- Links an order to the signed-in customer, when they ordered with an account.
+-- Guest orders leave this null.
+alter table public.orders add column if not exists user_id uuid references auth.users(id) on delete set null;
+
+create index if not exists orders_user_id_idx on public.orders(user_id);
 create index if not exists orders_created_at_idx on public.orders(created_at desc);
 create index if not exists orders_status_idx on public.orders(status);
 create index if not exists order_items_order_id_idx on public.order_items(order_id);
@@ -189,15 +238,28 @@ alter table public.order_items enable row level security;
 grant select, insert, update, delete on public.orders, public.order_items to authenticated;
 
 drop policy if exists "Authenticated users manage orders" on public.orders;
-create policy "Authenticated users manage orders" on public.orders
-  for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+drop policy if exists "Admins manage orders" on public.orders;
+create policy "Admins manage orders" on public.orders
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
 drop policy if exists "Authenticated users manage order items" on public.order_items;
-create policy "Authenticated users manage order items" on public.order_items
-  for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+drop policy if exists "Admins manage order items" on public.order_items;
+create policy "Admins manage order items" on public.order_items
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
--- Places a guest order atomically: validates stock, snapshots prices, inserts the
+-- Customers can read only the orders they placed while signed in.
+drop policy if exists "Customers read own orders" on public.orders;
+create policy "Customers read own orders" on public.orders
+  for select to authenticated using (auth.uid() = user_id);
+drop policy if exists "Customers read own order items" on public.order_items;
+create policy "Customers read own order items" on public.order_items
+  for select to authenticated using (
+    exists (select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid())
+  );
+
+-- Places an order atomically: validates stock, snapshots prices, inserts the
 -- order and items, and decrements stock. Prices always come from the products
--- table, never from the client.
+-- table, never from the client. When a customer is signed in the order is linked
+-- to their account so it appears in their order history.
 create or replace function public.place_order(
   p_customer_name text,
   p_customer_phone text,
@@ -236,7 +298,7 @@ begin
   v_shipping := greatest(coalesce(p_shipping_fee, 0), 0);
 
   insert into public.orders (
-    customer_name, customer_phone, customer_email, address, city, notes, payment_method, shipping_fee
+    customer_name, customer_phone, customer_email, address, city, notes, payment_method, shipping_fee, user_id
   ) values (
     trim(p_customer_name),
     trim(p_customer_phone),
@@ -245,7 +307,8 @@ begin
     trim(p_city),
     nullif(trim(coalesce(p_notes, '')), ''),
     p_payment_method,
-    v_shipping
+    v_shipping,
+    auth.uid()
   )
   returning id, order_number into v_order_id, v_order_number;
 
@@ -384,8 +447,9 @@ drop policy if exists "Public can read approved reviews" on public.reviews;
 create policy "Public can read approved reviews" on public.reviews
   for select to anon, authenticated using (status = 'approved');
 drop policy if exists "Authenticated users manage reviews" on public.reviews;
-create policy "Authenticated users manage reviews" on public.reviews
-  for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+drop policy if exists "Admins manage reviews" on public.reviews;
+create policy "Admins manage reviews" on public.reviews
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- Submits a verified-purchase review after matching the order number and phone.
 create or replace function public.submit_review(
