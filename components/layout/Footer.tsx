@@ -1,92 +1,45 @@
-import React from "react";
 import Link from "next/link";
-import { MessageCircle, Mail, ArrowRight } from "lucide-react";
+import { ArrowUpRight, MessageCircle } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 
+const footerLinks = [
+  { label: "Home", href: "/" },
+  { label: "Products", href: "/products" },
+  { label: "Categories", href: "/categories" },
+  { label: "Contact", href: "/contact" },
+];
+
 export function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="bg-white border-t border-gray-100 pt-16 pb-8 mt-auto">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 mb-16">
-          
-          {/* 1. Brand & About */}
-          <div className="space-y-4">
-            <Link href="/" aria-label="SHEZY home" className="inline-flex">
-              <BrandLogo width={126} />
+    <footer className="site-footer mt-12 border-t border-[#eaeaea] bg-white sm:mt-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-8 py-9 sm:grid-cols-2 sm:py-11 lg:grid-cols-[1.5fr_1fr_1fr] lg:gap-12">
+          <div className="max-w-sm">
+            <Link href="/" aria-label="SHEZY home" className="inline-flex rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#777]">
+              <BrandLogo width={118} className="mx-0" />
             </Link>
-            <p className="mt-2 text-[#666] text-sm leading-relaxed max-w-xs">
-              A considered collection of pieces for everyday living. Good things, chosen well.
-            </p>
+            <p className="mt-4 max-w-xs text-[13px] leading-6 text-[#666]">A considered edit of useful, well-chosen pieces for everyday living.</p>
           </div>
 
-          {/* 2. Quick Links */}
-          <div className="sm:justify-self-center lg:justify-self-start">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#444] mb-4">Quick links</h3>
-            <ul className="space-y-3">
-              <li><Link href="/" className="text-[#666] hover:text-black text-sm transition-colors">Home</Link></li>
-              <li><Link href="/categories" className="text-[#666] hover:text-black text-sm transition-colors">Categories</Link></li>
-              <li><Link href="/products" className="text-[#666] hover:text-black text-sm transition-colors">Products</Link></li>
-              <li><Link href="/contact" className="text-[#666] hover:text-black text-sm transition-colors">Contact</Link></li>
+          <nav aria-label="Footer navigation">
+            <h2 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#777]">Explore</h2>
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-1">
+              {footerLinks.map(({ label, href }) => <li key={href}><Link href={href} className="text-[13px] text-[#555] transition-colors hover:text-[#111]">{label}</Link></li>)}
             </ul>
-          </div>
+          </nav>
 
-          {/* 3. Get in Touch */}
-          <div className="lg:justify-self-center">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#444] mb-4">Get in touch</h3>
-            <ul className="space-y-3">
-              <li>
-                <a href="tel:+923260489379" className="text-[#666] hover:text-black text-sm transition-colors">
-                  0326-0489379
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="https://wa.me/923260489379" 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="inline-flex items-center gap-2 text-[#666] hover:text-black text-sm transition-colors"
-                >
-                  <MessageCircle size={15} /> WhatsApp
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* 4. Newsletter */}
-          <div className="lg:justify-self-end w-full">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#444] mb-4">Stay in the loop</h3>
-            <p className="text-[#666] text-sm mb-4">Subscribe to get special offers and updates.</p>
-            <form className="relative flex items-center">
-              <Mail className="absolute left-3 text-gray-400 h-4 w-4" />
-              <input 
-                type="email"
-                name="email"
-                placeholder="Your email" 
-                className="w-full bg-[#fcfcfc] border border-[#eaeaea] text-sm rounded-lg py-2.5 pl-9 pr-10 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all"
-                required
-              />
-              <button 
-                type="submit" 
-                className="absolute right-1.5 p-1.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-                aria-label="Subscribe"
-              >
-                <ArrowRight size={14} />
-              </button>
-            </form>
+          <div>
+            <h2 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#777]">Get in touch</h2>
+            <a href="tel:+923260489379" className="block w-fit text-[13px] text-[#555] transition-colors hover:text-[#111]">0326-0489379</a>
+            <a href="https://wa.me/923260489379" target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 text-[13px] text-[#555] transition-colors hover:text-[#111]">
+              <MessageCircle size={15} strokeWidth={1.7} />WhatsApp<ArrowUpRight size={13} />
+            </a>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-[#eaeaea] pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[#777] text-xs text-center md:text-left">
-            &copy; {currentYear} SHEZY. All rights reserved.
-          </p>
-          <div className="flex gap-3 items-center">
-            <span className="text-[10px] font-semibold text-[#888] uppercase tracking-wider border border-[#eaeaea] px-2 py-1 rounded">COD</span>
-            <span className="text-[10px] font-semibold text-[#888] uppercase tracking-wider border border-[#eaeaea] px-2 py-1 rounded">Bank Transfer</span>
-          </div>
+        <div className="flex flex-col gap-2 border-t border-[#eaeaea] py-5 text-[11px] text-[#777] sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} SHEZY. All rights reserved.</p>
+          <p>Thoughtfully chosen for everyday living.</p>
         </div>
       </div>
     </footer>

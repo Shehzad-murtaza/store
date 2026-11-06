@@ -103,7 +103,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     </div>
 
     <div className="grid min-w-0 gap-5 sm:gap-8 lg:grid-cols-2 lg:items-start lg:gap-12">
-      <ProductGallery images={product.product_images} productName={product.name} />
+      <ProductGallery key={product.slug} images={product.product_images} productName={product.name} />
       <section className="min-w-0 lg:py-2">
         {product.category && <Link href={`/categories/${product.category.slug}`} className="text-xs font-medium uppercase tracking-[0.13em] text-[#777] hover:text-[#111]">{product.category.name}</Link>}
         <h1 className="mt-2 break-words text-[25px] font-semibold leading-tight tracking-[-0.04em] sm:mt-3 sm:text-3xl">{product.name}</h1>

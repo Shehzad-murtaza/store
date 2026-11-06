@@ -431,6 +431,56 @@ html.dark .admin-sidebar-bottom,
 html.dark .admin-sheet-bottom { border-color: var(--border); }
 html.dark .admin-categories-actions button.text-red-700:hover { background: #351d1b; color: #f0aaa3; }
 
+/* Storefront shell: one quiet, responsive system around the editorial content. */
+.glass-site-header {
+  background: rgb(250 250 250 / 0.78);
+  border-bottom-color: rgb(234 234 234 / 0.78);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+.public-header-brand { align-items: center; }
+.public-header-brand .brand-logo-image { max-width: 100%; height: auto !important; }
+.public-header-menu { color: #333; }
+.public-header-menu:hover { background: rgb(17 17 17 / 0.06); }
+.public-nav-link[aria-current="page"] { color: #111; }
+.public-header-dashboard { border: 1px solid transparent; }
+.public-header-dashboard:hover { background: rgb(17 17 17 / 0.05); }
+.mobile-navigation-panel { color: #111; }
+.mobile-navigation-panel button,
+.mobile-navigation-panel a { -webkit-tap-highlight-color: transparent; }
+.site-footer { color: #111; }
+html.dark .site-footer { background: #111; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .site-footer > div > div:last-child { border-color: #2a2a2a; }
+html.dark .site-footer a { color: #b3b3b3; }
+html.dark .site-footer a:hover { color: #fff; }
+html.dark .site-footer p { color: #a3a3a3; }
+html.dark .mobile-navigation-panel { background: rgb(22 22 22 / 0.96); border-color: #333; color: #f5f5f5; }
+html.dark .mobile-navigation-panel > div { border-color: #303030; }
+html.dark .mobile-navigation-panel a[aria-current="page"] { background: #292929; color: #fff; }
+html.dark .mobile-navigation-panel a:not([aria-current="page"]) { color: #c2c2c2; }
+html.dark .mobile-navigation-panel a:hover { background: #252525; color: #fff; }
+html.dark .mobile-navigation-panel button { border-color: #333; background: #1c1c1c; color: #eee; }
+html.dark .public-header-menu { color: #eee; }
+html.dark .public-header-menu:hover { background: rgb(255 255 255 / 0.08); }
+html.dark .public-header-dashboard { color: #eee; }
+html.dark .public-header-dashboard:hover { background: rgb(255 255 255 / 0.08); }
+html.dark .public-nav-link[aria-current="page"] { color: #fff; }
+html.dark [class~="bg-[#111]"] { background-color: #f5f5f5 !important; color: #111 !important; }
+html.dark [class~="hover:bg-[#333]"]:hover { background-color: #dedede !important; color: #111 !important; }
+html.dark [class~="bg-[#f7f7f6]"],
+html.dark [class~="bg-[#f5f5f3]"],
+html.dark [class~="bg-[#f5f5f4]"],
+html.dark [class~="bg-[#f3f3f1]"],
+html.dark [class~="bg-[#f1f1ef]"] { background-color: #202020 !important; }
+html.dark [class~="border-[#111]"] { border-color: #f5f5f5 !important; }
+
+@media (max-width: 380px) {
+  .public-header-controls { gap: 0; }
+  .public-header-controls .public-header-cart,
+  .public-header-controls > button[aria-label="Toggle color theme"] { width: 34px; height: 34px; }
+  .public-header-dashboard { padding-inline: 7px; font-size: 11px; }
+}
+
 /* Theme-aware frosted glass treatment for the public storefront header. */
 .glass-site-header {
   background: rgb(250 250 250 / 0.74);

@@ -27,37 +27,27 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const filters = parseCatalogFilters(search);
 
   return (
-    <main className="mx-auto min-h-[70vh] max-w-[1280px] px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
-      
-      {/* Page Header */}
-      <header className="mb-10 max-w-2xl sm:mb-12">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+    <main className="mx-auto min-h-[70vh] max-w-[1280px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <header className="mb-8 max-w-2xl sm:mb-10">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">
           The SHEZY Collection
         </p>
-        <h1 className="text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">
+        <h1 className="text-3xl font-semibold tracking-[-0.04em] text-[#111] sm:text-4xl">
           All Products
         </h1>
-        <p className="mt-4 text-base sm:text-lg leading-relaxed text-gray-600">
+        <p className="mt-3 max-w-xl text-sm leading-6 text-[#666]">
           A considered edit of pieces for everyday living. Discover premium quality products designed for the modern lifestyle.
         </p>
-        <div className="mt-6 h-1 w-16 bg-black rounded-full"></div>
       </header>
-      
-      {/* Filters & Product Grid Layout */}
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-10">
-        
-        {/* Left Sidebar / Mobile Filter Button */}
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
         <Suspense fallback={<ProductFilterSkeleton />}>
           <ProductFilterPanel />
         </Suspense>
-        
-        {/* Product Grid Results */}
         <div className="min-w-0 w-full">
           <Suspense fallback={<ProductGridSkeleton />}>
             <ProductResults filters={filters} clearHref="/products" />
           </Suspense>
         </div>
-        
       </div>
     </main>
   );

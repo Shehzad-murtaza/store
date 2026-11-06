@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Image from "next/image";
 import { ArrowRight, Truck, ShieldCheck, Clock } from "lucide-react";
 import Link from "next/link";
 import { CategoryCard } from "@/components/catalog/CategoryCard";
@@ -45,23 +46,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Side Stacked Cards */}
-          <div className="flex flex-col gap-4 sm:gap-6">
-            <Link href="/categories/new-arrivals" className="relative group flex-1 rounded-[32px] bg-gray-900 overflow-hidden flex items-end p-8 shadow-sm min-h-[240px]">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/0 z-10 transition-opacity group-hover:opacity-70"></div>
-              <div className="relative z-20">
-                <p className="text-gray-300 text-xs font-bold uppercase tracking-wider mb-2">Just Dropped</p>
-                <h3 className="text-white text-3xl font-bold tracking-tight">New Arrivals</h3>
-              </div>
-            </Link>
-            
-            <Link href="/categories/accessories" className="relative group flex-1 rounded-[32px] bg-gray-100 overflow-hidden flex items-end p-8 shadow-sm border border-gray-200 hover:border-gray-300 transition-colors min-h-[240px]">
-              <div className="relative z-20">
-                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Must Haves</p>
-                <h3 className="text-gray-900 text-3xl font-bold tracking-tight">Accessories</h3>
-              </div>
-            </Link>
-          </div>
+          <Suspense fallback={<HomePromosFallback />}><HomePromos /></Suspense>
 
         </div>
       </section>
@@ -69,21 +54,21 @@ export default function HomePage() {
       {/* 2. Trust Badges / Value Propositions */}
       <section className="py-8 bg-white">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-y border-gray-100 py-12">
+          <div className="grid grid-cols-1 gap-7 border-y border-gray-100 py-8 text-center sm:py-9 md:grid-cols-3 md:gap-6">
             <div className="flex flex-col items-center">
-              <Truck className="h-10 w-10 text-black mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Fast Delivery</h3>
-              <p className="text-gray-500 text-sm">Swift and reliable shipping nationwide.</p>
+              <Truck className="mb-3 h-6 w-6 text-black" strokeWidth={1.6} />
+              <h3 className="mb-1.5 text-sm font-semibold text-gray-900">Fast Delivery</h3>
+              <p className="text-[13px] text-gray-500">Swift and reliable shipping nationwide.</p>
             </div>
             <div className="flex flex-col items-center">
-              <ShieldCheck className="h-10 w-10 text-black mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Secure Payments</h3>
-              <p className="text-gray-500 text-sm">100% safe & encrypted checkout process.</p>
+              <ShieldCheck className="mb-3 h-6 w-6 text-black" strokeWidth={1.6} />
+              <h3 className="mb-1.5 text-sm font-semibold text-gray-900">Secure Payments</h3>
+              <p className="text-[13px] text-gray-500">100% safe &amp; encrypted checkout process.</p>
             </div>
             <div className="flex flex-col items-center">
-              <Clock className="h-10 w-10 text-black mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Premium Support</h3>
-              <p className="text-gray-500 text-sm">We&apos;re always here to help you out.</p>
+              <Clock className="mb-3 h-6 w-6 text-black" strokeWidth={1.6} />
+              <h3 className="mb-1.5 text-sm font-semibold text-gray-900">Premium Support</h3>
+              <p className="text-[13px] text-gray-500">We&apos;re always here to help you out.</p>
             </div>
           </div>
         </div>
@@ -99,14 +84,49 @@ export default function HomePage() {
   );
 }
 
+async function HomePromos() {
+  const [newestProducts, categories] = await Promise.all([
+    getProducts({ sort: "newest", limit: 1 }),
+    getCategoriesWithCounts(),
+  ]);
+  const newestProduct = newestProducts[0];
+  const category = categories.find((item) => item.product_count > 0);
+
+  return <div className="flex flex-col gap-4 sm:gap-6">
+    <Link href="/products" className="group relative flex min-h-[220px] flex-1 items-end overflow-hidden rounded-[28px] bg-[#17191f] p-6 shadow-sm sm:min-h-[240px] sm:rounded-[32px] sm:p-8">
+      {newestProduct?.primary_image_url && <Image src={newestProduct.primary_image_url} alt="" fill priority sizes="(max-width: 1024px) 100vw, 35vw" className="object-cover opacity-60 transition-transform duration-700 group-hover:scale-[1.03]" />}
+      <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/15" />
+      <span className="relative z-10">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/70">Just dropped</span>
+        <span className="block text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">New arrivals</span>
+      </span>
+    </Link>
+
+    <Link href={category ? `/categories/${category.slug}` : "/categories"} className={`group relative flex min-h-[220px] flex-1 items-end overflow-hidden rounded-[28px] p-6 shadow-sm transition-colors sm:min-h-[240px] sm:rounded-[32px] sm:p-8 ${category?.image_url ? "bg-[#17191f]" : "border border-[#eaeaea] bg-[#f3f3f1] hover:border-[#d7d7d7]"}`}>
+      {category?.image_url && <Image src={category.image_url} alt="" fill priority sizes="(max-width: 1024px) 100vw, 35vw" className="object-cover opacity-65 transition-transform duration-700 group-hover:scale-[1.03]" />}
+      {category?.image_url && <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />}
+      <span className="relative z-10">
+        <span className={`mb-2 block text-xs font-semibold uppercase tracking-[0.14em] ${category?.image_url ? "text-white/70" : "text-[#777]"}`}>{category ? "Shop a category" : "Browse the collection"}</span>
+        <span className={`block text-2xl font-semibold tracking-[-0.04em] sm:text-3xl ${category?.image_url ? "text-white" : "text-[#111]"}`}>{category?.name ?? "Categories"}</span>
+      </span>
+    </Link>
+  </div>;
+}
+
+function HomePromosFallback() {
+  return <div className="flex flex-col gap-4 sm:gap-6">
+    <Link href="/products" className="flex min-h-[220px] flex-1 items-end rounded-[28px] bg-[#17191f] p-6 shadow-sm sm:min-h-[240px] sm:rounded-[32px] sm:p-8"><span><span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/70">Just dropped</span><span className="block text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">New arrivals</span></span></Link>
+    <Link href="/categories" className="flex min-h-[220px] flex-1 items-end rounded-[28px] border border-[#eaeaea] bg-[#f3f3f1] p-6 shadow-sm sm:min-h-[240px] sm:rounded-[32px] sm:p-8"><span><span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Browse the collection</span><span className="block text-2xl font-semibold tracking-[-0.04em] text-[#111] sm:text-3xl">Categories</span></span></Link>
+  </div>;
+}
+
 function FeaturedSectionHeading() {
   return (
-    <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-center sm:text-left">
+    <div className="mb-6 flex flex-col justify-between gap-4 text-center sm:mb-7 sm:flex-row sm:items-end sm:text-left">
       <div>
-        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">Featured Collection</h2>
-        <div className="mt-3 h-1 w-16 bg-black mx-auto sm:mx-0 rounded-full"></div>
+        <h2 className="text-2xl font-semibold tracking-[-0.04em] text-gray-900 sm:text-3xl">Featured Collection</h2>
       </div>
-      <Link href="/products" className="inline-flex items-center justify-center gap-1 text-sm font-bold text-gray-600 hover:text-black transition-colors">
+      <Link href="/products" className="inline-flex items-center justify-center gap-1 text-[13px] font-medium text-gray-600 transition-colors hover:text-black">
         View all products <ArrowRight size={16} />
       </Link>
     </div>
@@ -158,12 +178,11 @@ function FeaturedProductsFallback() {
 
 function CategoriesHeading() {
   return (
-    <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-center sm:text-left">
+    <div className="mb-6 flex flex-col justify-between gap-4 text-center sm:mb-7 sm:flex-row sm:items-end sm:text-left">
       <div>
-        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">Shop by Category</h2>
-        <div className="mt-3 h-1 w-16 bg-black mx-auto sm:mx-0 rounded-full"></div>
+        <h2 className="text-2xl font-semibold tracking-[-0.04em] text-gray-900 sm:text-3xl">Shop by Category</h2>
       </div>
-      <Link href="/categories" className="inline-flex items-center justify-center gap-1 text-sm font-bold text-gray-600 hover:text-black transition-colors">
+      <Link href="/categories" className="inline-flex items-center justify-center gap-1 text-[13px] font-medium text-gray-600 transition-colors hover:text-black">
         View all categories <ArrowRight size={16} />
       </Link>
     </div>
