@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { WishlistProvider } from "@/components/wishlist/WishlistProvider";

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { MessageCircle, Mail, ArrowRight } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 
-export default function Footer() {
+export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
