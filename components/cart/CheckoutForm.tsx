@@ -1,131 +1,167 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { CircleAlert, ImageIcon, LoaderCircle, Lock, Truck, Wallet } from "lucide-react";
-import { useCart } from "@/components/cart/CartProvider";
-import { EmptyState } from "@/components/catalog/EmptyState";
-import { Input } from "@/components/ui/input";
-import { placeOrder } from "@/app/(public)/checkout/actions";
-import { formatPKR } from "@/lib/catalog/format";
-import { SHIPPING_FEE } from "@/lib/catalog/orders";
-import { cn } from "@/lib/utils";
+import { Truck, MapPin, CreditCard, Banknote, ShieldCheck } from "lucide-react";
+// import { useCart } from "@/components/cart/CartProvider";
 
-type Errors = Partial<Record<"customerName" | "customerPhone" | "address" | "city", string>>;
+// Temporary mock data UI check karne ke liye. (Isy apne context/state se replace kar lena)
+const mockCartItems = [
+  { id: "1", name: "Premium Leather Jacket", price: 120.00, quantity: 1, image_url: "/placeholder.png" }
+];
 
-export function CheckoutForm() {
-  const router = useRouter();
-  const { lines, subtotal, ready, clear } = useCart();
-  const [values, setValues] = useState({ customerName: "", customerPhone: "", customerEmail: "", address: "", city: "", notes: "" });
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "bank">("cod");
-  const [errors, setErrors] = useState<Errors>({});
-  const [formError, setFormError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+export default function CheckoutForm() {
+  // const { cartItems, cartTotal } = useCart();
+  const cartItems = mockCartItems;
+  const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const shippingFee = 15.00; 
+  const finalTotal = cartTotal + shippingFee;
 
-  function update(field: keyof typeof values, value: string) {
-    setValues((current) => ({ ...current, [field]: value }));
-    if (field in errors) setErrors((current) => ({ ...current, [field]: undefined }));
-    setFormError("");
-  }
+  const [paymentMethod, setPaymentMethod] = useState("cod");
 
-  function validate(): boolean {
-    const next: Errors = {};
-    if (!values.customerName.trim()) next.customerName = "Please enter your name.";
-    if (!values.customerPhone.trim()) next.customerPhone = "Please enter your phone number.";
-    if (!values.address.trim()) next.address = "Please enter your delivery address.";
-    if (!values.city.trim()) next.city = "Please enter your city.";
-    setErrors(next);
-    return Object.keys(next).length === 0;
-  }
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex flex-col lg:flex-row gap-12">
+        
+        {/* Left Column: Checkout Form */}
+        <div className="flex-1">
+          <h1 className="text-3xl font-black text-gray-900 mb-8 tracking-tight">Checkout</h1>
+          
+          <form className="space-y-8">
+            {/* 1. Contact Info */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm">
+              <h2 className="text-xl font-bold flex items-center gap-2 mb-6 border-b pb-4">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white text-sm">1</span>
+                Contact Information
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-gray-700">Full Name *</label>
+                  <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all" placeholder="John Doe" required />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-gray-700">Phone Number *</label>
+                  <input type="tel" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all" placeholder="+1 234 567 8900" required />
+                </div>
+                <div className="sm:col-span-2 space-y-1">
+                  <label className="text-sm font-semibold text-gray-700">Email Address <span className="text-gray-400 font-normal">(Optional)</span></label>
+                  <input type="email" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all" placeholder="john@example.com" />
+                </div>
+              </div>
+            </div>
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    if (submitting) return;
-    if (!lines.length) return;
-    if (!validate()) return;
+            {/* 2. Shipping Address */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm">
+              <h2 className="text-xl font-bold flex items-center gap-2 mb-6 border-b pb-4">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white text-sm">2</span>
+                Shipping Address
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-gray-700">Complete Address *</label>
+                  <textarea rows={3} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all resize-none" placeholder="House/Apt No, Street Name, Area..." required></textarea>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-700">City *</label>
+                    <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all" placeholder="e.g. New York" required />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    setSubmitting(true);
-    setFormError("");
-    try {
-      const result = await placeOrder({
-        ...values,
-        paymentMethod,
-        items: lines.map((line) => ({ productId: line.productId, quantity: line.quantity })),
-      });
-      if (!result.ok || !result.orderNumber) {
-        setFormError(result.error ?? "The order could not be placed. Please try again.");
-        return;
-      }
-      clear();
-      router.push(`/order/${encodeURIComponent(result.orderNumber)}?phone=${encodeURIComponent(values.customerPhone)}&placed=1`);
-    } catch {
-      setFormError("The order could not be placed. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
+            {/* 3. Payment Method */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm">
+              <h2 className="text-xl font-bold flex items-center gap-2 mb-6 border-b pb-4">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white text-sm">3</span>
+                Payment Method
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* COD Option */}
+                <label className={`relative flex cursor-pointer rounded-xl border p-4 focus:outline-none transition-all ${paymentMethod === 'cod' ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <input type="radio" name="payment_method" value="cod" className="sr-only" onChange={(e) => setPaymentMethod(e.target.value)} checked={paymentMethod === 'cod'} />
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-gray-100">
+                        <Banknote className="h-5 w-5 text-gray-700" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="block text-sm font-bold text-gray-900">Cash on Delivery</span>
+                        <span className="block text-xs text-gray-500">Pay when you receive</span>
+                      </div>
+                    </div>
+                  </div>
+                </label>
 
-  if (ready && !lines.length) {
-    return <EmptyState title="Your cart is empty" description="Add a few pieces to your cart before checking out." actionHref="/products" actionLabel="Browse products" />;
-  }
+                {/* Bank Transfer Option */}
+                <label className={`relative flex cursor-pointer rounded-xl border p-4 focus:outline-none transition-all ${paymentMethod === 'bank' ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <input type="radio" name="payment_method" value="bank" className="sr-only" onChange={(e) => setPaymentMethod(e.target.value)} checked={paymentMethod === 'bank'} />
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-gray-100">
+                        <CreditCard className="h-5 w-5 text-gray-700" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="block text-sm font-bold text-gray-900">Bank Transfer</span>
+                        <span className="block text-xs text-gray-500">Direct account transfer</span>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
 
-  const total = subtotal + SHIPPING_FEE;
+        {/* Right Column: Order Summary (Sticky) */}
+        <div className="w-full lg:w-[400px] shrink-0">
+          <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-100 sticky top-24">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">In Your Cart</h2>
+            
+            <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2">
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex gap-4 items-center">
+                  <div className="relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border border-gray-200 bg-white">
+                    <Image src={item.image_url} alt={item.name} fill className="object-cover" />
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-500 text-[10px] text-white font-bold border-2 border-white">
+                      {item.quantity}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{item.name}</h3>
+                    <p className="text-sm text-gray-500 font-medium">${item.price.toFixed(2)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-  return <form onSubmit={handleSubmit} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(300px,0.9fr)] lg:gap-8" noValidate>
-    <div className="space-y-6">
-      <section className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-sm font-semibold tracking-[-0.02em]">Delivery details</h2>
-        <div className="mt-5 grid gap-5">
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="contact-field"><span>Full name</span><Input name="customerName" autoComplete="name" required maxLength={120} value={values.customerName} onChange={(event) => update("customerName", event.target.value)} placeholder="Your name" className={cn("contact-input", errors.customerName && "border-[#e0b4b0]")} aria-invalid={Boolean(errors.customerName)} />{errors.customerName && <small className="field-error" role="alert">{errors.customerName}</small>}</label>
-            <label className="contact-field"><span>Phone number</span><Input name="customerPhone" type="tel" autoComplete="tel" required maxLength={40} value={values.customerPhone} onChange={(event) => update("customerPhone", event.target.value)} placeholder="03XX-XXXXXXX" className={cn("contact-input", errors.customerPhone && "border-[#e0b4b0]")} aria-invalid={Boolean(errors.customerPhone)} />{errors.customerPhone && <small className="field-error" role="alert">{errors.customerPhone}</small>}</label>
-          </div>
-          <label className="contact-field"><span>Email <small>(optional)</small></span><Input name="customerEmail" type="email" autoComplete="email" maxLength={254} value={values.customerEmail} onChange={(event) => update("customerEmail", event.target.value)} placeholder="you@example.com" className="contact-input" /></label>
-          <label className="contact-field"><span>Delivery address</span><textarea name="address" required maxLength={500} rows={3} value={values.address} onChange={(event) => update("address", event.target.value)} placeholder="House / street / area" className={cn("contact-textarea", errors.address && "border-[#e0b4b0]")} aria-invalid={Boolean(errors.address)} />{errors.address && <small className="field-error" role="alert">{errors.address}</small>}</label>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="contact-field"><span>City</span><Input name="city" autoComplete="address-level2" required maxLength={120} value={values.city} onChange={(event) => update("city", event.target.value)} placeholder="City" className={cn("contact-input", errors.city && "border-[#e0b4b0]")} aria-invalid={Boolean(errors.city)} />{errors.city && <small className="field-error" role="alert">{errors.city}</small>}</label>
-            <label className="contact-field"><span>Order notes <small>(optional)</small></span><Input name="notes" maxLength={500} value={values.notes} onChange={(event) => update("notes", event.target.value)} placeholder="Landmark or instructions" className="contact-input" /></label>
+            <div className="space-y-3 text-sm text-gray-600 border-t border-gray-200 pt-6">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="font-semibold text-gray-900">${cartTotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span className="font-semibold text-gray-900">${shippingFee.toFixed(2)}</span>
+              </div>
+            </div>
+            
+            <div className="flex justify-between items-center my-6 border-t border-gray-200 pt-6">
+              <span className="text-lg font-bold text-gray-900">Total</span>
+              <span className="text-2xl font-black text-black">${finalTotal.toFixed(2)}</span>
+            </div>
+            
+            <button className="w-full rounded-xl bg-black px-6 py-4 text-base font-bold text-white shadow-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
+              <ShieldCheck className="h-5 w-5" />
+              Place Order
+            </button>
+            <p className="text-xs text-center text-gray-500 mt-4">
+              By placing your order, you agree to our Terms and Conditions.
+            </p>
           </div>
         </div>
-      </section>
 
-      <section className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-sm font-semibold tracking-[-0.02em]">Payment method</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <button type="button" onClick={() => setPaymentMethod("cod")} aria-pressed={paymentMethod === "cod"} className={cn("flex items-start gap-3 rounded-lg border p-4 text-left transition-colors", paymentMethod === "cod" ? "border-[#1a1a1a] bg-[#fafafa] ring-1 ring-[#1a1a1a]" : "border-[#eaeaea] hover:bg-[#fafafa]")}>
-            <Truck size={18} className="mt-0.5 shrink-0 text-[#555]" />
-            <span><span className="block text-sm font-medium">Cash on delivery</span><span className="mt-1 block text-xs leading-5 text-[#777]">Pay in cash when your order arrives.</span></span>
-          </button>
-          <button type="button" onClick={() => setPaymentMethod("bank")} aria-pressed={paymentMethod === "bank"} className={cn("flex items-start gap-3 rounded-lg border p-4 text-left transition-colors", paymentMethod === "bank" ? "border-[#1a1a1a] bg-[#fafafa] ring-1 ring-[#1a1a1a]" : "border-[#eaeaea] hover:bg-[#fafafa]")}>
-            <Wallet size={18} className="mt-0.5 shrink-0 text-[#555]" />
-            <span><span className="block text-sm font-medium">Bank transfer</span><span className="mt-1 block text-xs leading-5 text-[#777]">We share the account details on WhatsApp after you order.</span></span>
-          </button>
-        </div>
-      </section>
+      </div>
     </div>
-
-    <aside aria-label="Order summary" className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-24">
-      <h2 className="text-sm font-semibold tracking-[-0.02em]">Your order</h2>
-      <ul className="mt-4 space-y-3">
-        {lines.map((line) => <li key={line.productId} className="flex items-center gap-3">
-          <div className="relative size-12 shrink-0 overflow-hidden rounded-lg border border-[#eaeaea] bg-[#f2f2f0]">{line.imageUrl ? <Image src={line.imageUrl} alt="" fill sizes="48px" className="object-cover" /> : <span className="grid h-full place-items-center text-[#999]"><ImageIcon size={16} strokeWidth={1.4} /></span>}</div>
-          <div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium text-[#222]">{line.name}</p><p className="mt-0.5 text-xs text-[#777]">{line.quantity} × {formatPKR(line.unitPrice)}</p></div>
-          <span className="shrink-0 text-[13px] font-medium">{formatPKR(line.unitPrice * line.quantity)}</span>
-        </li>)}
-      </ul>
-      <dl className="mt-5 space-y-2.5 border-t border-[#eaeaea] pt-4 text-sm">
-        <div className="flex items-center justify-between"><dt className="text-[#666]">Subtotal</dt><dd className="font-medium">{formatPKR(subtotal)}</dd></div>
-        <div className="flex items-center justify-between"><dt className="text-[#666]">Delivery</dt><dd className="font-medium">{SHIPPING_FEE === 0 ? "Free" : formatPKR(SHIPPING_FEE)}</dd></div>
-        <div className="flex items-center justify-between border-t border-[#eaeaea] pt-3 text-base"><dt className="font-semibold">Total</dt><dd className="font-semibold">{formatPKR(total)}</dd></div>
-      </dl>
-      {formError && <div role="alert" className="mt-4 flex items-start gap-2 rounded-lg border border-[#e4c4c1] bg-[#fff7f6] p-3 text-xs leading-5 text-[#963d35]"><CircleAlert size={15} className="mt-0.5 shrink-0" />{formError}</div>}
-      <button type="submit" disabled={submitting || !ready || !lines.length} className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-60">
-        {submitting ? <><LoaderCircle size={16} className="animate-spin" />Placing order…</> : <><Lock size={15} />Place order</>}
-      </button>
-      <p className="mt-3 text-center text-[11px] leading-5 text-[#888]">You will get an order number to track this order.</p>
-      <Link href="/cart" className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-lg border border-[#eaeaea] text-sm text-[#444] transition-colors hover:bg-[#fafafa]">Back to cart</Link>
-    </aside>
-  </form>;
+  );
 }
