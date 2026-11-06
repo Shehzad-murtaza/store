@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { AdminSearchFilters } from "@/components/admin/AdminSearchFilters";
 import { EmptyState } from "@/components/catalog/EmptyState";
 import { RatingStars } from "@/components/reviews/RatingStars";
 import { ReviewActions } from "@/components/admin/ReviewActions";
@@ -42,11 +42,11 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
     </div>
 
     <div className="mb-4 flex flex-wrap items-center gap-3">
-      <form action="/admin/reviews" method="get" className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
-        <label className="relative min-w-[220px] flex-1"><span className="sr-only">Search reviews</span><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#888]" /><input name="q" defaultValue={query} placeholder="Search customer, product, or text" className="admin-input admin-search-input h-10" /></label>
-        <label className="shrink-0"><span className="sr-only">Filter by status</span><select name="status" defaultValue={status} className="admin-select h-10 w-[170px]"><option value="">All statuses</option>{STATUSES.map((entry) => <option key={entry} value={entry}>{STATUS_LABELS[entry]}</option>)}</select></label>
-        <button type="submit" className="h-10 shrink-0 rounded-lg bg-[#1a1a1a] px-3 text-xs font-medium text-white transition-colors hover:bg-[#333]">Filter</button>
-      </form>
+      <AdminSearchFilters
+        searchPlaceholder="Search customer, product, or text"
+        searchAriaLabel="Search reviews"
+        selects={[{ name: "status", ariaLabel: "Filter by status", options: [{ value: "", label: "All statuses" }, ...STATUSES.map((entry) => ({ value: entry, label: STATUS_LABELS[entry] }))] }]}
+      />
       <span className="shrink-0 whitespace-nowrap text-sm text-neutral-500">{reviews.length} {reviews.length === 1 ? "review" : "reviews"}</span>
     </div>
 

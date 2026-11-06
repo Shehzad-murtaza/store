@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
+import { AdminSearchFilters } from "@/components/admin/AdminSearchFilters";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { EmptyState } from "@/components/catalog/EmptyState";
 import { deleteProduct } from "@/app/admin/actions";
@@ -39,13 +40,15 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
     </header>
     <div className="admin-products-toolbar-container mb-4">
     <div className="admin-products-toolbar flex items-center gap-3">
-      <form action="/admin/products" method="get" className="admin-products-filter-form flex min-w-0 flex-1 items-center gap-3">
-        <label className="admin-products-search relative"><span className="sr-only">Search products</span><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#888]" /><input name="q" defaultValue={query} placeholder="Search by name or slug" className="admin-input admin-search-input h-10 min-w-[220px] max-w-sm" /></label>
-        <label className="shrink-0"><span className="sr-only">Filter by category</span><select name="category" defaultValue={categoryId} className="admin-select h-10 w-[180px]"><option value="">All categories</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
-        <label className="shrink-0"><span className="sr-only">Filter by stock status</span><select name="status" defaultValue={status} className="admin-select h-10 w-[180px]"><option value="">All statuses</option><option value="in_stock">In Stock</option><option value="sold">Sold</option></select></label>
-        <label className="flex h-10 shrink-0 items-center gap-2 rounded-lg border border-[#eaeaea] px-3 text-xs text-[#555]"><input type="checkbox" name="featured" value="true" defaultChecked={featured} className="size-4 accent-[#1a1a1a]" />Featured only</label>
-        <button type="submit" className="h-10 shrink-0 rounded-lg bg-[#1a1a1a] px-3 text-xs font-medium text-white transition-colors hover:bg-[#333]">Filter</button>
-      </form>
+      <AdminSearchFilters
+        searchPlaceholder="Search by name or slug"
+        searchAriaLabel="Search products"
+        selects={[
+          { name: "category", ariaLabel: "Filter by category", widthClass: "w-[180px]", options: [{ value: "", label: "All categories" }, ...categories.map((category) => ({ value: category.id, label: category.name }))] },
+          { name: "status", ariaLabel: "Filter by stock status", widthClass: "w-[180px]", options: [{ value: "", label: "All statuses" }, { value: "in_stock", label: "In Stock" }, { value: "sold", label: "Sold" }] },
+        ]}
+        checkbox={{ name: "featured", label: "Featured only", value: "true" }}
+      />
       {products.length > 0 && <span className="shrink-0 whitespace-nowrap text-sm text-neutral-500">{products.length} {products.length === 1 ? "product" : "products"}</span>}
     </div>
     </div>

@@ -16,7 +16,7 @@ The `/admin` route requires a valid Supabase Auth session. RLS allows catalog wr
 
 ## Environment variables
 
-Copy `.env.local.example` to `.env.local`, then add the two values from the Supabase project settings:
+Add the two values from the Supabase project settings to `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
@@ -24,6 +24,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-project-publishable-or-legacy-anon-key
 ```
 
 The public key is intended for browser use and is protected by the database's RLS policies. Never add a service-role key to a `NEXT_PUBLIC_` variable.
+
+For production, also set the canonical origin so sitemaps, canonical links and social previews point at the live domain:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
+Without it the app falls back to `VERCEL_URL` and then `http://localhost:3000`.
 
 ## Run locally
 
@@ -44,4 +52,4 @@ npm start
 
 ## Vercel deployment
 
-Import the repository into Vercel, add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` under **Project Settings → Environment Variables**, and deploy. Run the SQL against the Supabase project used by the deployment.
+Import the repository into Vercel, add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SITE_URL` under **Project Settings → Environment Variables**, and deploy. Run the SQL against the Supabase project used by the deployment.

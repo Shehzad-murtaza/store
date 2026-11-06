@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
+import { AdminSearchFilters } from "@/components/admin/AdminSearchFilters";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { deleteCategory } from "@/app/admin/actions";
 import { getCategoriesWithCounts } from "@/lib/supabase/catalog";
@@ -21,7 +22,7 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
       <div className="flex items-center justify-between gap-4"><h1 className="!my-0">Categories</h1><Link href="/admin/categories/new" className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-[#1a1a1a] px-4 text-xs font-medium text-white transition-colors hover:bg-[#333]"><Plus size={15} />Add category</Link></div>
       <p className="!mt-2 text-sm text-[#666]">Organize products into clear, easy-to-browse collections.</p>
     </header>
-    <div className="mb-4 flex items-center justify-between gap-4"><form action="/admin/categories" method="get" className="relative w-full max-w-[360px]"><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#888]" /><input name="q" defaultValue={searchValue} placeholder="Search categories" className="admin-input admin-search-input h-10" /></form><span className="shrink-0 text-[13px] text-[#777]">{categories.length} {categories.length === 1 ? "category" : "categories"}</span></div>
+    <div className="mb-4 flex items-center justify-between gap-4"><div className="w-full max-w-[420px]"><AdminSearchFilters searchPlaceholder="Search categories" searchAriaLabel="Search categories" /></div><span className="shrink-0 text-[13px] text-[#777]">{categories.length} {categories.length === 1 ? "category" : "categories"}</span></div>
     {categories.length ? <div className="admin-table-wrap"><table className="admin-table admin-categories-table"><thead><tr><th>Category</th><th>Slug</th><th>Products</th><th className="text-right">Actions</th></tr></thead><tbody>
       {categories.map((category) => <tr key={category.id}>
         <td><div className="flex min-w-40 items-center gap-3"><div className="relative size-10 shrink-0 overflow-hidden rounded-md border border-[#eaeaea] bg-[#f2f2f0]">{category.image_url ? <Image src={category.image_url} alt="" fill sizes="40px" className="object-cover" /> : null}</div><div className="truncate font-medium text-[#222]">{category.name}</div></div></td>

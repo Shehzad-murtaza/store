@@ -338,6 +338,48 @@ html.dark [class~="text-[#55705a]"] { color: #a8c6ad !important; }
 html.dark [class~="bg-[#fff7f6]"] { background: #351d1b !important; }
 html.dark [class~="border-[#e4c4c1]"] { border-color: #58312c !important; }
 html.dark [class~="text-[#7c3732]"] { color: #e5a39c !important; }
+
+/* Tokens used by storefront controls and form buttons that fall outside the
+   base palette. Without these, dark text sat on dark surfaces. */
+html.dark [class~="bg-[#f1f1f1]"] { background-color: #222 !important; }
+html.dark [class~="bg-[#f5f2e9]"] { background-color: #302a1c !important; }
+html.dark [class~="text-[#272a24]"],
+html.dark [class~="text-[#55584f]"] { color: #ededed !important; }
+html.dark [class~="text-[#35543a]"],
+html.dark [class~="text-[#3d5c43]"] { color: #a8d2ae !important; }
+html.dark [class~="text-[#786536]"] { color: #d8c58b !important; }
+html.dark [class~="text-[#a43d35]"] { color: #f0aaa3 !important; }
+html.dark [class~="border-[#cfe0d2]"] { border-color: #334538 !important; }
+html.dark [class~="border-[#35543a]"] { border-color: #4a6b50 !important; }
+html.dark [class~="text-red-700"] { color: #f0aaa3 !important; }
+html.dark [class~="hover:bg-[#f5f4ef]"]:hover,
+html.dark [class~="hover:bg-[#f1f0e9]"]:hover,
+html.dark [class~="hover:bg-[#f2f7f2]"]:hover,
+html.dark [class~="hover:bg-red-50"]:hover { background-color: #2a2a2a !important; }
+html.dark [class~="hover:bg-[#f5f4ef]"]:hover,
+html.dark [class~="hover:bg-[#f1f0e9]"]:hover { color: #fff !important; }
+/* Ink-on-dark hover states: without these, hovered text turned black on a
+   dark surface and disappeared. */
+html.dark [class~="hover:text-black"]:hover,
+html.dark [class~="hover:text-[#111]"]:hover { color: #fff !important; }
+html.dark [class~="text-[#8a6b28]"] { color: #e3c07a !important; }
+html.dark [class~="text-[#47714d]"] { color: #a8d2ae !important; }
+html.dark [class~="hover:text-[#a43d35]"]:hover { color: #f0aaa3 !important; }
+html.dark [class~="hover:bg-[#fff7f6]"]:hover { background-color: #351d1b !important; }
+html.dark [class~="divide-[#eaeaea]"] > :not(:last-child),
+html.dark [class~="divide-[#f0f0f0]"] > :not(:last-child),
+html.dark [class~="divide-[#dedede]"] > :not(:last-child) { border-color: #2a2a2a !important; }
+html.dark .field-error,
+html.dark .admin-field .field-error,
+html.dark .admin-field b { color: #f0aaa3; }
+html.dark .admin-field small,
+html.dark .contact-field small,
+html.dark .admin-label,
+html.dark .login-footnote { color: #8a8a8a; }
+html.dark .admin-card p,
+html.dark .admin-content > p,
+html.dark .login-card > p { color: var(--secondary); }
+
 html.dark .brand-logo-image { filter: invert(1); }
 html.dark .admin-sheet-overlay { background: #0009; }
 html.dark .admin-sheet { box-shadow: 8px 0 32px #0008; }

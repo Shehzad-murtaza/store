@@ -69,3 +69,29 @@ export async function updateFulfilment(orderId: string, trackingNumber: string, 
   revalidateOrders(orderId);
   return { ok: true };
 }
+
+/** Permanently removes an order and its items. Orders cannot be restored. */
+export async function deleteOrder(orderId: string): Promise<AdminActionResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("orders").delete().eq("id", orderId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidateOrders(orderId);
+  return { ok: true };
+}
+
+/** Wipes the entire order history, including every order item. */
+export async function deleteAllOrders(): Promise<AdminActionResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("orders").delete().not("id", "is", null);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+  revalidatePath("/admin/analytics");
+  return { ok: true };
+}
