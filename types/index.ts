@@ -18,6 +18,7 @@ export interface Product {
   category_id: string | null;
   is_sold: boolean;
   is_featured: boolean;
+  stock_quantity: number;
   created_at: string;
   updated_at: string;
 }
@@ -28,4 +29,38 @@ export interface ProductImage {
   image_url: string;
   is_primary: boolean;
   sort_order: number;
+}
+
+export type OrderStatus = "pending" | "confirmed" | "packed" | "shipped" | "delivered" | "cancelled";
+export type PaymentMethod = "cod" | "bank";
+export type PaymentStatus = "unpaid" | "paid";
+
+export interface Order {
+  id: string;
+  order_number: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string | null;
+  address: string;
+  city: string;
+  notes: string | null;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
+  status: OrderStatus;
+  subtotal: number;
+  shipping_fee: number;
+  total: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string | null;
+  product_name: string;
+  product_slug: string | null;
+  unit_price: number;
+  quantity: number;
+  line_total: number;
 }

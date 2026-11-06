@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { EmptyState } from "@/components/catalog/EmptyState";
 import { deleteProduct } from "@/app/admin/actions";
 import { formatPKR } from "@/lib/catalog/format";
+import { isOutOfStock } from "@/lib/catalog/orders";
 import { getCategories, getProducts } from "@/lib/supabase/catalog";
 
 export const metadata: Metadata = { title: "Products · Admin" };
@@ -48,12 +49,13 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
       {products.length > 0 && <span className="shrink-0 whitespace-nowrap text-sm text-neutral-500">{products.length} {products.length === 1 ? "product" : "products"}</span>}
     </div>
     </div>
-    {products.length ? <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Status</th><th>Featured</th><th className="text-right">Actions</th></tr></thead><tbody>
+    {products.length ? <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Featured</th><th className="text-right">Actions</th></tr></thead><tbody>
       {products.map((product) => <tr key={product.id}>
         <td><div className="flex min-w-52 items-center gap-3"><div className="relative size-12 shrink-0 overflow-hidden rounded-lg border border-[#eaeaea] bg-[#f2f2f0]">{product.primary_image_url ? <Image src={product.primary_image_url} alt="" fill sizes="48px" className="object-cover" /> : <div className="grid h-full place-items-center text-[9px] text-[#999]">No image</div>}</div><div className="min-w-0"><div className="max-w-64 truncate font-medium text-[#222]">{product.name}</div><code className="mt-1 block max-w-64 truncate text-[10px] text-[#888]">{product.slug}</code></div></div></td>
         <td>{product.category?.name ?? <span className="text-[#999]">Uncategorized</span>}</td>
         <td><div className="whitespace-nowrap font-medium">{formatPKR(product.discount_price ?? product.price)}</div>{product.discount_price !== null && <div className="mt-1 text-[10px] text-[#888] line-through">{formatPKR(product.price)}</div>}</td>
-        <td><span className={`admin-status ${product.is_sold ? "sold" : "available"}`}>{product.is_sold ? "Sold" : "In Stock"}</span></td>
+        <td className="whitespace-nowrap">{product.stock_quantity}</td>
+        <td><span className={`admin-status ${isOutOfStock(product) ? "sold" : "available"}`}>{isOutOfStock(product) ? "Sold out" : "In stock"}</span></td>
         <td>{product.is_featured ? <span className="admin-featured">Featured</span> : <span className="text-xs text-[#999]">—</span>}</td>
         <td><div className="flex justify-end gap-2"><Link href={`/admin/products/${product.id}/edit`} className="rounded-lg border border-[#eaeaea] px-3 py-2 text-xs font-medium hover:bg-[#f7f7f7]">Edit</Link><ConfirmDialog title={`Delete ${product.name}?`} description="This permanently removes the product and its image records. Stored product images will also be removed." action={deleteProduct} actionId={product.id} /></div></td>
       </tr>)}

@@ -122,3 +122,202 @@ create policy "Authenticated users can upload product images" on storage.objects
 drop policy if exists "Authenticated users can delete product images" on storage.objects;
 create policy "Authenticated users can delete product images" on storage.objects
   for delete to authenticated using (bucket_id = 'product-images' and auth.uid() is not null);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Storefront orders and stock tracking.
+-- Customers order as guests: writes happen only through the security-definer
+-- functions below, so the tables themselves expose no anon access.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Adds stock tracking. The very first time this column is created, existing
+-- products receive a starting stock of 10 so the storefront stays orderable;
+-- edit each product afterwards to set its real quantity.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'products' and column_name = 'stock_quantity'
+  ) then
+    alter table public.products add column stock_quantity integer not null default 0;
+    update public.products set stock_quantity = 10 where is_sold = false;
+  end if;
+end $$;
+
+create sequence if not exists public.order_number_seq start 1001;
+
+create table if not exists public.orders (
+  id uuid primary key default gen_random_uuid(),
+  order_number text not null unique default ('ORD-' || nextval('public.order_number_seq')),
+  customer_name text not null,
+  customer_phone text not null,
+  customer_email text,
+  address text not null,
+  city text not null,
+  notes text,
+  payment_method text not null check (payment_method in ('cod', 'bank')),
+  payment_status text not null default 'unpaid' check (payment_status in ('unpaid', 'paid')),
+  status text not null default 'pending' check (status in ('pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled')),
+  subtotal numeric(12, 2) not null default 0,
+  shipping_fee numeric(12, 2) not null default 0,
+  total numeric(12, 2) not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.order_items (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references public.orders(id) on delete cascade,
+  product_id uuid references public.products(id) on delete set null,
+  product_name text not null,
+  product_slug text,
+  unit_price numeric(12, 2) not null,
+  quantity integer not null check (quantity > 0),
+  line_total numeric(12, 2) not null
+);
+
+create index if not exists orders_created_at_idx on public.orders(created_at desc);
+create index if not exists orders_status_idx on public.orders(status);
+create index if not exists order_items_order_id_idx on public.order_items(order_id);
+
+drop trigger if exists orders_set_updated_at on public.orders;
+create trigger orders_set_updated_at before update on public.orders
+  for each row execute function public.set_updated_at();
+
+alter table public.orders enable row level security;
+alter table public.order_items enable row level security;
+
+grant select, insert, update, delete on public.orders, public.order_items to authenticated;
+
+drop policy if exists "Authenticated users manage orders" on public.orders;
+create policy "Authenticated users manage orders" on public.orders
+  for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+drop policy if exists "Authenticated users manage order items" on public.order_items;
+create policy "Authenticated users manage order items" on public.order_items
+  for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+
+-- Places a guest order atomically: validates stock, snapshots prices, inserts the
+-- order and items, and decrements stock. Prices always come from the products
+-- table, never from the client.
+create or replace function public.place_order(
+  p_customer_name text,
+  p_customer_phone text,
+  p_customer_email text,
+  p_address text,
+  p_city text,
+  p_notes text,
+  p_payment_method text,
+  p_shipping_fee numeric,
+  p_items jsonb
+)
+returns json
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_order_id uuid;
+  v_order_number text;
+  v_shipping numeric(12, 2);
+  v_subtotal numeric(12, 2) := 0;
+  v_item record;
+  v_product record;
+  v_unit_price numeric(12, 2);
+  v_quantity integer;
+begin
+  if coalesce(trim(p_customer_name), '') = '' then raise exception 'Customer name is required'; end if;
+  if coalesce(trim(p_customer_phone), '') = '' then raise exception 'Customer phone is required'; end if;
+  if coalesce(trim(p_address), '') = '' then raise exception 'Delivery address is required'; end if;
+  if coalesce(trim(p_city), '') = '' then raise exception 'City is required'; end if;
+  if p_payment_method not in ('cod', 'bank') then raise exception 'Unsupported payment method'; end if;
+  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
+    raise exception 'Your cart is empty';
+  end if;
+
+  v_shipping := greatest(coalesce(p_shipping_fee, 0), 0);
+
+  insert into public.orders (
+    customer_name, customer_phone, customer_email, address, city, notes, payment_method, shipping_fee
+  ) values (
+    trim(p_customer_name),
+    trim(p_customer_phone),
+    nullif(trim(coalesce(p_customer_email, '')), ''),
+    trim(p_address),
+    trim(p_city),
+    nullif(trim(coalesce(p_notes, '')), ''),
+    p_payment_method,
+    v_shipping
+  )
+  returning id, order_number into v_order_id, v_order_number;
+
+  for v_item in select * from jsonb_to_recordset(p_items) as x(product_id uuid, quantity integer) loop
+    v_quantity := coalesce(v_item.quantity, 0);
+    if v_quantity <= 0 then raise exception 'Invalid quantity'; end if;
+
+    select id, name, slug, price, discount_price, stock_quantity, is_sold
+      into v_product
+      from public.products
+      where id = v_item.product_id
+      for update;
+
+    if not found then raise exception 'A product in your cart is no longer available'; end if;
+    if v_product.is_sold or v_product.stock_quantity < v_quantity then
+      raise exception 'Not enough stock for %', v_product.name;
+    end if;
+
+    v_unit_price := coalesce(v_product.discount_price, v_product.price);
+
+    insert into public.order_items (order_id, product_id, product_name, product_slug, unit_price, quantity, line_total)
+    values (v_order_id, v_product.id, v_product.name, v_product.slug, v_unit_price, v_quantity, v_unit_price * v_quantity);
+
+    v_subtotal := v_subtotal + (v_unit_price * v_quantity);
+
+    update public.products
+      set stock_quantity = stock_quantity - v_quantity,
+          is_sold = (stock_quantity - v_quantity) <= 0
+      where id = v_product.id;
+  end loop;
+
+  update public.orders
+    set subtotal = v_subtotal,
+        total = v_subtotal + v_shipping
+    where id = v_order_id;
+
+  return json_build_object(
+    'order_number', v_order_number,
+    'subtotal', v_subtotal,
+    'shipping_fee', v_shipping,
+    'total', v_subtotal + v_shipping
+  );
+end;
+$$;
+
+-- Lets a guest read a single order by matching the order number with the phone
+-- used at checkout. Returns null when nothing matches.
+create or replace function public.lookup_order(p_order_number text, p_phone text)
+returns json
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_result json;
+begin
+  select json_build_object(
+    'order', to_jsonb(o),
+    'items', coalesce(
+      (select json_agg(to_jsonb(i) order by i.id) from public.order_items i where i.order_id = o.id),
+      '[]'::json
+    )
+  )
+  into v_result
+  from public.orders o
+  where upper(trim(o.order_number)) = upper(trim(p_order_number))
+    and right(regexp_replace(o.customer_phone, '\D', '', 'g'), 10)
+        = right(regexp_replace(coalesce(p_phone, ''), '\D', '', 'g'), 10);
+
+  return v_result;
+end;
+$$;
+
+grant execute on function public.place_order(text, text, text, text, text, text, text, numeric, jsonb) to anon, authenticated;
+grant execute on function public.lookup_order(text, text) to anon, authenticated;

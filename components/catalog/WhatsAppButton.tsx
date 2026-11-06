@@ -3,6 +3,7 @@
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatPKR } from "@/lib/catalog/format";
+import { SELLER_WHATSAPP } from "@/lib/site";
 
 export function WhatsAppButton({ name, price, slug }: { name: string; price: number; slug: string }) {
   function shareWithSeller() {
@@ -16,7 +17,7 @@ export function WhatsAppButton({ name, price, slug }: { name: string; price: num
       "",
       "Please give me more details.",
     ].join("\n");
-    const whatsappUrl = `https://wa.me/923260489379?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/${SELLER_WHATSAPP}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   }
 

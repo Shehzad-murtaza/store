@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, MessageCircle, Phone } from "lucide-react";
 import { ContactForm } from "@/components/layout/ContactForm";
+import { SELLER_PHONE_DISPLAY, SELLER_WHATSAPP } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Contact SHEZY with a question about the collection, an order, or anything else. We’re happy to help.",
 };
 
-const whatsappLink = `https://wa.me/923260489379?text=${encodeURIComponent("Hello SHEZY, I would like to get in touch.")}`;
+const whatsappLink = `https://wa.me/${SELLER_WHATSAPP}?text=${encodeURIComponent("Hello SHEZY, I would like to get in touch.")}`;
 
 export default function ContactPage() {
   return <main className="mx-auto min-h-[65vh] max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
@@ -28,7 +29,7 @@ export default function ContactPage() {
         <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">We’re one message away.</h2>
         <p className="mt-2 text-sm leading-6 text-[#666]">Reach us on WhatsApp or give us a call. We’re happy to help with product questions and more.</p>
         <Link href={whatsappLink} target="_blank" rel="noreferrer" className="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#1a1a1a] px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#333] hover:shadow-md"><MessageCircle size={16} />Chat on WhatsApp <ArrowUpRight size={14} /></Link>
-        <a href="tel:+923260489379" className="mt-4 flex items-center gap-3 rounded-lg border border-[#eaeaea] px-4 py-3 text-sm text-[#444] transition hover:bg-[#fafafa] hover:text-black"><Phone size={16} className="text-[#777]" /><span><span className="block text-[10px] uppercase tracking-[0.1em] text-[#888]">Call us</span><span className="mt-0.5 block font-medium">0326-0489379</span></span></a>
+        <a href={`tel:+${SELLER_WHATSAPP}`} className="mt-4 flex items-center gap-3 rounded-lg border border-[#eaeaea] px-4 py-3 text-sm text-[#444] transition hover:bg-[#fafafa] hover:text-black"><Phone size={16} className="text-[#777]" /><span><span className="block text-[10px] uppercase tracking-[0.1em] text-[#888]">Call us</span><span className="mt-0.5 block font-medium">{SELLER_PHONE_DISPLAY}</span></span></a>
       </aside>
     </div>
   </main>;

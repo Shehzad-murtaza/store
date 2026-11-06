@@ -44,6 +44,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .admin-field { display: grid; min-width: 0; gap: 6px; color: #333; font-size: 14px; font-weight: 500; }
 .admin-field b { color: #dc2626; font-weight: 600; }
 .admin-field .field-error { color: #dc2626; }
+.field-error, .contact-field small.field-error { color: #dc2626; }
 .admin-field small { color: #888; font-size: 11px; font-weight: 400; }
 .admin-input { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 8px; background: var(--input); padding: 0 12px; color: var(--foreground); font: inherit; font-size: 13px; outline: none; }
 .admin-input.admin-search-input { padding-left: 40px; }
@@ -77,6 +78,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .admin-status.available { background: #eff4ee; color: #46624a; }
 .admin-status.sold { background: #f1f1f1; color: #666; }
 .admin-featured { background: #f5f2e9; color: #786536; }
+.status-pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 10px; font-size: 10px; font-weight: 600; letter-spacing: .03em; white-space: nowrap; }
+.status-pill.pending { background: #fdf4e5; color: #92600f; }
+.status-pill.progress { background: #eaf1fb; color: #2f5c96; }
+.status-pill.done { background: #eff4ee; color: #46624a; }
+.status-pill.cancelled { background: #fbeeed; color: #a13b32; }
+.cart-count-badge { position: absolute; top: -5px; right: -5px; display: inline-flex; min-width: 17px; height: 17px; align-items: center; justify-content: center; border-radius: 999px; background: #1a1a1a; padding: 0 4px; color: #fff; font-size: 10px; font-weight: 600; line-height: 1; }
 .admin-toggle { position: relative; display: inline-flex; cursor: pointer; align-items: center; gap: 9px; font-size: 13px; color: #444; }
 .admin-toggle input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .admin-toggle-track { display: flex; width: 36px; height: 21px; align-items: center; border-radius: 999px; background: #d7d7d4; padding: 2px; transition: background .15s; }
@@ -210,6 +217,11 @@ html.dark .admin-table td { border-color: #2a2a2a; color: #a3a3a3; }
 html.dark .admin-status.available { background: #1c2b20; color: #a8d2ae; }
 html.dark .admin-status.sold { background: #292929; color: #bbb; }
 html.dark .admin-featured { background: #302a1c; color: #d8c58b; }
+html.dark .status-pill.pending { background: #33280f; color: #e3c07a; }
+html.dark .status-pill.progress { background: #1b2739; color: #a7c4e8; }
+html.dark .status-pill.done { background: #1c2b20; color: #a8d2ae; }
+html.dark .status-pill.cancelled { background: #351d1b; color: #f0aaa3; }
+html.dark .cart-count-badge { background: #f5f5f5; color: #111; }
 html.dark .admin-toggle-track { background: #555; }
 html.dark .admin-toggle input:checked + .admin-toggle-track { background: #eee; }
 html.dark .admin-toggle input:checked + .admin-toggle-track span { background: #111; }
@@ -386,4 +398,18 @@ html.dark .home-hero-glow { background: radial-gradient(circle, rgb(255 255 255 
 }
 @media (prefers-reduced-motion: reduce) {
   .home-hero-content > * { animation: none !important; opacity: 1; transform: none; }
+}
+
+/* Invoice printing keeps only the order document visible. */
+@media print {
+  .no-print,
+  .admin-sidebar,
+  .admin-mobile-bar,
+  .admin-topline { display: none !important; }
+  .admin-shell { display: block; background: #fff; }
+  .admin-main { padding: 0; }
+  .admin-content { margin: 0; max-width: none; }
+  #invoice { border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+  html.dark,
+  html.dark body { background: #fff; color: #111; }
 }

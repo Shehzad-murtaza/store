@@ -128,6 +128,8 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
   const discountText = field(formData, "discount_price");
   const discountValue = discountText.trim() === "" ? null : Number(discountText);
   const discountPrice = discountValue === 0 ? null : discountValue;
+  const stockText = field(formData, "stock_quantity");
+  const stockQuantity = stockText === "" ? 0 : Number(stockText);
   const primarySelection = field(formData, "primarySelection");
 
   if (!name || name.length > 180) return { ok: false, error: "Enter a product name of 180 characters or fewer." };
@@ -136,6 +138,7 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
   if (discountPrice !== null && (!Number.isFinite(discountPrice) || discountPrice < 0 || discountPrice >= price)) {
     return { ok: false, error: "The discount price must be a valid amount below the original price." };
   }
+  if (!Number.isInteger(stockQuantity) || stockQuantity < 0) return { ok: false, error: "Enter a valid stock quantity of 0 or more." };
 
   const values = {
     name,
@@ -144,6 +147,7 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
     category_id: categoryId || null,
     price,
     discount_price: discountPrice,
+    stock_quantity: stockQuantity,
     is_featured: formData.get("is_featured") === "on",
     is_sold: formData.get("is_sold") === "on",
   };

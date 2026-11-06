@@ -12,7 +12,7 @@ export interface ProductWithCatalogData extends Product {
   primary_image_url: string | null;
 }
 
-export interface ProductCardData extends Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "category_id" | "is_sold" | "is_featured" | "created_at" | "updated_at"> {
+export interface ProductCardData extends Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "category_id" | "is_sold" | "is_featured" | "stock_quantity" | "created_at" | "updated_at"> {
   category: Pick<Category, "id" | "name" | "slug"> | null;
   primary_image_url: string | null;
 }
@@ -35,7 +35,7 @@ type ProductRow = Product & {
   category?: Pick<Category, "id" | "name" | "slug"> | null;
 };
 
-type ProductListingRow = Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "category_id" | "is_sold" | "is_featured" | "created_at" | "updated_at"> & {
+type ProductListingRow = Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "category_id" | "is_sold" | "is_featured" | "stock_quantity" | "created_at" | "updated_at"> & {
   product_images: Array<Pick<ProductImage, "image_url" | "is_primary" | "sort_order">>;
   category?: Pick<Category, "id" | "name" | "slug"> | null;
 };
@@ -100,10 +100,10 @@ export const getProducts = unstable_cache(async (filters: ProductFilters = {}): 
     categoryId = category.id;
   }
 
-  let query = supabase.from("products").select("id, name, slug, price, discount_price, category_id, is_sold, is_featured, created_at, updated_at, product_images(image_url, is_primary, sort_order), category:categories(id, name, slug)");
+  let query = supabase.from("products").select("id, name, slug, price, discount_price, category_id, is_sold, is_featured, stock_quantity, created_at, updated_at, product_images(image_url, is_primary, sort_order), category:categories(id, name, slug)");
   if (categoryId) query = query.eq("category_id", categoryId);
-  if (filters.availability === "in_stock") query = query.eq("is_sold", false);
-  if (filters.availability === "sold") query = query.eq("is_sold", true);
+  if (filters.availability === "in_stock") query = query.eq("is_sold", false).gt("stock_quantity", 0);
+  if (filters.availability === "sold") query = query.or("is_sold.eq.true,stock_quantity.lte.0");
   if (filters.featuredOnly) query = query.eq("is_featured", true);
   if (filters.excludeId) query = query.neq("id", filters.excludeId);
   const searchTerm = filters.searchTerm?.trim().replace(/[\\%_,()]/g, " ").replace(/\s+/g, " ").trim();
@@ -141,6 +141,7 @@ export const getProducts = unstable_cache(async (filters: ProductFilters = {}): 
       category_id: row.category_id,
       is_sold: row.is_sold,
       is_featured: row.is_featured,
+      stock_quantity: row.stock_quantity,
       created_at: row.created_at,
       updated_at: row.updated_at,
       category: row.category ?? null,

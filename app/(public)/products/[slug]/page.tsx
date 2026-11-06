@@ -3,9 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
+import { AddToCartButton } from "@/components/catalog/AddToCartButton";
 import { WhatsAppButton } from "@/components/catalog/WhatsAppButton";
 import { PublicBackButton } from "@/components/layout/PublicBackButton";
 import { formatPKR } from "@/lib/catalog/format";
+import { isOutOfStock } from "@/lib/catalog/orders";
 import { getProductBySlug, getProducts } from "@/lib/supabase/catalog";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -26,6 +28,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     : [];
   const hasDiscount = product.discount_price !== null;
   const currentPrice = hasDiscount ? product.discount_price! : product.price;
+  const outOfStock = isOutOfStock(product);
 
   return <main className="mx-auto w-full max-w-[1280px] px-4 pb-12 pt-5 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8">
     <div className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 sm:mb-6">
@@ -46,8 +49,26 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <span className="text-xl font-semibold">{formatPKR(currentPrice)}</span>
           {hasDiscount && <span className="text-sm text-[#888] line-through">{formatPKR(product.price)}</span>}
         </div>
-        <div className="mt-5"><span className={`inline-flex rounded-md px-2.5 py-1 text-xs font-medium ${product.is_sold ? "bg-[#f1f1f1] text-[#666]" : "bg-[#f0f4ef] text-[#45614a]"}`}>{product.is_sold ? "Sold" : "In Stock"}</span></div>
-        <div className="mt-6 w-full sm:mt-8 lg:max-w-md"><WhatsAppButton name={product.name} price={Number(currentPrice)} slug={product.slug} /></div>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <span className={`inline-flex rounded-md px-2.5 py-1 text-xs font-medium ${outOfStock ? "bg-[#f1f1f1] text-[#666]" : "bg-[#f0f4ef] text-[#45614a]"}`}>{outOfStock ? "Sold out" : "In stock"}</span>
+          {!outOfStock && product.stock_quantity <= 5 && <span className="text-xs font-medium text-[#8a6b28]">Only {product.stock_quantity} left</span>}
+        </div>
+        <div className="mt-6 w-full space-y-3 sm:mt-8 lg:max-w-md">
+          <AddToCartButton
+            product={{
+              id: product.id,
+              slug: product.slug,
+              name: product.name,
+              price: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.primary_image_url,
+              stock: product.stock_quantity,
+              sold: product.is_sold,
+            }}
+            className="py-3.5 text-sm"
+          />
+          <WhatsAppButton name={product.name} price={Number(currentPrice)} slug={product.slug} />
+        </div>
       </section>
     </div>
 
