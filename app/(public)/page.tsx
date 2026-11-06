@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import Image from "next/image";
-import { ArrowRight, ArrowUpRight, ImageIcon, Truck, ShieldCheck, Clock } from "lucide-react";
+import { ArrowRight, Truck, ShieldCheck, Clock } from "lucide-react";
 import Link from "next/link";
 import { CategoryCard } from "@/components/catalog/CategoryCard";
 import { EmptyState } from "@/components/catalog/EmptyState";
-import ProductCard from "@/components/catalog/ProductCard"; // Fixed default import here
+import ProductCard from "@/components/catalog/ProductCard";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
-import { formatPKR } from "@/lib/catalog/format";
 import { getCategoriesWithCounts, getProducts } from "@/lib/supabase/catalog";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
@@ -25,49 +23,67 @@ export default function HomePage() {
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
       
-      {/* 1. Hero Banner Section (Modernized) */}
-      <section className="relative w-full h-[75vh] min-h-[500px] flex items-center justify-center bg-[#F6F6F4] overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-100 to-gray-200 opacity-70"></div>
-        
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-10">
-          <span className="inline-block py-1.5 px-4 rounded-full bg-black text-white text-xs font-bold uppercase tracking-widest mb-6 shadow-md">
-            New Collection Arrived
-          </span>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 tracking-tighter mb-6 leading-tight">
-            Elevate Your <br className="hidden sm:block" /> Everyday Style.
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto font-medium">
-            Good things, chosen well. A small edit of pieces for everyday use.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/products" className="w-full sm:w-auto bg-black text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-1">
-              Shop Now <ArrowRight className="h-5 w-5" />
+      {/* 1. The Modern Bento Grid Hero Section */}
+      <section className="mx-auto max-w-[1280px] px-4 pt-6 pb-12 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 min-h-[500px]">
+          
+          {/* Main Large Card */}
+          <div className="lg:col-span-2 relative rounded-[32px] bg-[#F6F6F4] overflow-hidden flex flex-col justify-center p-8 sm:p-12 md:p-16 shadow-sm border border-gray-100">
+            <span className="inline-block py-1.5 px-4 rounded-full bg-black text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-6 self-start">
+              SHEZY Exclusive
+            </span>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 tracking-tighter mb-6 leading-[1.05]">
+              Good things,<br />chosen well.
+            </h1>
+            <p className="text-gray-600 mb-10 max-w-md text-base sm:text-lg font-medium">
+              A considered edit of pieces for everyday living. Elevate your lifestyle with our premium collection.
+            </p>
+            <div className="flex flex-wrap gap-4 mt-auto">
+              <Link href="/products" className="bg-black text-white px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1">
+                Explore Now <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Side Stacked Cards */}
+          <div className="flex flex-col gap-4 sm:gap-6">
+            <Link href="/categories/new-arrivals" className="relative group flex-1 rounded-[32px] bg-gray-900 overflow-hidden flex items-end p-8 shadow-sm min-h-[240px]">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/0 z-10 transition-opacity group-hover:opacity-70"></div>
+              <div className="relative z-20">
+                <p className="text-gray-300 text-xs font-bold uppercase tracking-wider mb-2">Just Dropped</p>
+                <h3 className="text-white text-3xl font-bold tracking-tight">New Arrivals</h3>
+              </div>
             </Link>
-            <Link href="/categories" className="w-full sm:w-auto bg-white text-black border-2 border-gray-200 px-8 py-4 rounded-xl font-bold text-lg hover:border-black transition-all flex items-center justify-center">
-              Explore Categories
+            
+            <Link href="/categories/accessories" className="relative group flex-1 rounded-[32px] bg-gray-100 overflow-hidden flex items-end p-8 shadow-sm border border-gray-200 hover:border-gray-300 transition-colors min-h-[240px]">
+              <div className="relative z-20">
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Must Haves</p>
+                <h3 className="text-gray-900 text-3xl font-bold tracking-tight">Accessories</h3>
+              </div>
             </Link>
           </div>
+
         </div>
       </section>
 
       {/* 2. Trust Badges / Value Propositions */}
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-gray-100">
-            <div className="flex flex-col items-center p-4">
+      <section className="py-8 bg-white">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-y border-gray-100 py-12">
+            <div className="flex flex-col items-center">
               <Truck className="h-10 w-10 text-black mb-4" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">Fast Delivery</h3>
               <p className="text-gray-500 text-sm">Swift and reliable shipping nationwide.</p>
             </div>
-            <div className="flex flex-col items-center p-4 pt-8 md:pt-4">
+            <div className="flex flex-col items-center">
               <ShieldCheck className="h-10 w-10 text-black mb-4" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">Secure Payments</h3>
               <p className="text-gray-500 text-sm">100% safe & encrypted checkout process.</p>
             </div>
-            <div className="flex flex-col items-center p-4 pt-8 md:pt-4">
+            <div className="flex flex-col items-center">
               <Clock className="h-10 w-10 text-black mb-4" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">Premium Support</h3>
-              <p className="text-gray-500 text-sm">We're always here to help you out.</p>
+              <p className="text-gray-500 text-sm">We&apos;re always here to help you out.</p>
             </div>
           </div>
         </div>
@@ -102,12 +118,11 @@ async function FeaturedProductsSection() {
   const products = featured.length ? featured : await getProducts({ sort: "newest", limit: 4 });
   
   return (
-    <section id="featured" className="mx-auto max-w-[1280px] px-4 py-20 sm:px-6 lg:px-8 bg-gray-50">
+    <section id="featured" className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 bg-white">
       <FeaturedSectionHeading />
       {products.length ? (
         <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
           {products.map((product) => (
-            // Added simple mapping if your product schema doesn't perfectly match the component interface
             <ProductCard 
               product={{
                 id: product.id,
@@ -135,7 +150,7 @@ async function FeaturedProductsSection() {
 
 function FeaturedProductsFallback() {
   return (
-    <section id="featured" className="mx-auto max-w-[1280px] px-4 py-20 sm:px-6 lg:px-8 bg-gray-50">
+    <section id="featured" className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 bg-white">
       <FeaturedSectionHeading />
       <div aria-label="Loading featured products" className="grid grid-cols-2 gap-4 animate-pulse sm:gap-6 lg:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
@@ -171,7 +186,7 @@ async function CategoriesSection() {
   const activeCategories = categories.filter((category) => category.product_count > 0);
   
   return (
-    <section id="categories" className="bg-white">
+    <section id="categories" className="bg-[#F6F6F4]">
       <div className="mx-auto max-w-[1280px] px-4 py-20 sm:px-6 lg:px-8">
         <CategoriesHeading />
         {activeCategories.length ? (
@@ -195,12 +210,12 @@ async function CategoriesSection() {
 
 function CategoriesFallback() {
   return (
-    <section id="categories" className="bg-white">
+    <section id="categories" className="bg-[#F6F6F4]">
       <div className="mx-auto max-w-[1280px] px-4 py-20 sm:px-6 lg:px-8">
         <CategoriesHeading />
         <div aria-label="Loading categories" className="grid grid-cols-2 gap-4 animate-pulse sm:gap-6 lg:grid-cols-3">
           {Array.from({ length: 3 }, (_, index) => (
-            <div key={index} className="overflow-hidden rounded-2xl bg-gray-100 shadow-sm aspect-video" />
+            <div key={index} className="overflow-hidden rounded-2xl bg-gray-200 shadow-sm aspect-video" />
           ))}
         </div>
       </div>

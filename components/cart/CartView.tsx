@@ -28,7 +28,7 @@ export default function CartView() {
           <ShoppingBag className="h-10 w-10 text-gray-400" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-        <p className="text-gray-500 mb-8 max-w-md">Looks like you haven't added anything to your cart yet. Explore our top categories to find something you love.</p>
+        <p className="text-gray-500 mb-8 max-w-md">Looks like you haven&apos;t added anything to your cart yet. Explore our top categories to find something you love.</p>
         <Link 
           href="/products" 
           className="bg-black text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl"

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Truck, MapPin, CreditCard, Banknote, ShieldCheck } from "lucide-react";
+import { CreditCard, Banknote, ShieldCheck } from "lucide-react";
 // import { useCart } from "@/components/cart/CartProvider";
 
 // Temporary mock data UI check karne ke liye. (Isy apne context/state se replace kar lena)
