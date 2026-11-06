@@ -11,6 +11,7 @@ import { RatingStars } from "@/components/reviews/RatingStars";
 import { PublicBackButton } from "@/components/layout/PublicBackButton";
 import { formatPKR } from "@/lib/catalog/format";
 import { isOutOfStock } from "@/lib/catalog/orders";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { getProductBySlug, getProducts } from "@/lib/supabase/catalog";
 import { getProductReviews } from "@/lib/supabase/reviews";
 
@@ -19,7 +20,29 @@ type PageProps = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  return { title: product?.name ?? "Product", description: product?.description ?? undefined };
+  if (!product) return { title: "Product not found", robots: { index: false, follow: false } };
+
+  const price = product.discount_price ?? product.price;
+  const description = product.description?.replace(/\s+/g, " ").trim().slice(0, 160) || `${product.name} — available at ${SITE_NAME} for ${formatPKR(price)}.`;
+
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical: `/products/${product.slug}` },
+    openGraph: {
+      type: "website",
+      title: product.name,
+      description,
+      url: `/products/${product.slug}`,
+      images: product.primary_image_url ? [{ url: product.primary_image_url, alt: product.name }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: product.primary_image_url ? [product.primary_image_url] : undefined,
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
@@ -35,7 +58,40 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const currentPrice = hasDiscount ? product.discount_price! : product.price;
   const outOfStock = isOutOfStock(product);
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    sku: product.id,
+    brand: { "@type": "Brand", name: SITE_NAME },
+    ...(product.description ? { description: product.description } : {}),
+    ...(product.category ? { category: product.category.name } : {}),
+    ...(product.product_images.length ? { image: product.product_images.map((image) => image.image_url) } : {}),
+    ...(product.rating_count > 0 ? { aggregateRating: { "@type": "AggregateRating", ratingValue: Number(product.rating_average), reviewCount: product.rating_count } } : {}),
+    offers: {
+      "@type": "Offer",
+      url: `${SITE_URL}/products/${product.slug}`,
+      price: Number(currentPrice),
+      priceCurrency: "PKR",
+      itemCondition: "https://schema.org/NewCondition",
+      availability: outOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Products", item: `${SITE_URL}/products` },
+      ...(product.category ? [{ "@type": "ListItem", position: 2, name: product.category.name, item: `${SITE_URL}/categories/${product.category.slug}` }] : []),
+      { "@type": "ListItem", position: product.category ? 3 : 2, name: product.name, item: `${SITE_URL}/products/${product.slug}` },
+    ],
+  };
+
   return <main className="mx-auto w-full max-w-[1280px] px-4 pb-12 pt-5 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+
     <div className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 sm:mb-6">
       <PublicBackButton fallbackHref="/products" />
       <nav aria-label="Breadcrumb" className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-[#777] sm:text-xs">

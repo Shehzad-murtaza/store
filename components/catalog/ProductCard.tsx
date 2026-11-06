@@ -7,7 +7,7 @@ import type { ProductCardData } from "@/lib/supabase/catalog";
 import { formatPKR } from "@/lib/catalog/format";
 import { isOutOfStock } from "@/lib/catalog/orders";
 
-export function ProductCard({ product }: { product: ProductCardData }) {
+export function ProductCard({ product, priority = false }: { product: ProductCardData; priority?: boolean }) {
   const hasDiscount = product.discount_price !== null;
   const outOfStock = isOutOfStock(product);
   const lowStock = !outOfStock && product.stock_quantity <= 5;
@@ -20,6 +20,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             src={product.primary_image_url}
             alt={product.name}
             fill
+            priority={priority}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
           /> : <div className="flex h-full flex-col items-center justify-center gap-2 text-[#999]">

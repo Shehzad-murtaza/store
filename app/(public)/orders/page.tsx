@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { OrderLookupForm } from "@/components/orders/OrderLookupForm";
 
-export const metadata: Metadata = { title: "Track your order" };
+export const metadata: Metadata = { title: "Track your order", robots: { index: false, follow: false } };
 
 export default function OrdersPage() {
   return <main className="mx-auto min-h-[60vh] w-full max-w-[560px] px-4 py-10 sm:px-6 sm:py-16 lg:px-8">

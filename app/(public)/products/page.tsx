@@ -6,7 +6,11 @@ import { parseCatalogFilters, type CatalogSearchParams } from "@/lib/catalog/fil
 import { getCategories } from "@/lib/supabase/catalog";
 import type { ParsedCatalogFilters } from "@/lib/catalog/filters";
 
-export const metadata: Metadata = { title: "Products" };
+export const metadata: Metadata = {
+  title: "All products",
+  description: "Browse the full SHEZY collection — a considered edit of pieces for everyday living.",
+  alternates: { canonical: "/products" },
+};
 
 async function ProductFilterPanel({ filters }: { filters: ParsedCatalogFilters }) {
   const categories = await getCategories();

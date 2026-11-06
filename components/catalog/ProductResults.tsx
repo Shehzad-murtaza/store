@@ -40,6 +40,6 @@ export async function ProductResults({ filters, categoryId, categorySlug, clearH
   }
   return <section aria-label="Product results" className="w-full min-w-0">
     <p className="mb-4 text-[13px] text-[#666]">{products.length} {products.length === 1 ? "product" : "products"}</p>
-    <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div>
+    <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">{products.map((product, index) => <ProductCard key={product.id} product={product} priority={index < 3} />)}</div>
   </section>;
 }

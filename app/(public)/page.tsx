@@ -1,14 +1,27 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { CategoryCard } from "@/components/catalog/CategoryCard";
 import { EmptyState } from "@/components/catalog/EmptyState";
 import { ProductCard } from "@/components/catalog/ProductCard";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { getCategoriesWithCounts, getProducts } from "@/lib/supabase/catalog";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
+const storeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "OnlineStore",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+};
 
 export default function HomePage() {
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
       <section id="home-hero" className="home-hero relative isolate m-0 flex h-[100svh] items-center justify-center overflow-x-clip bg-[#F6F6F4] px-4 text-[#111111] sm:px-6">
         <div aria-hidden="true" className="home-hero-glow pointer-events-none absolute left-1/2 top-1/2" />
         <div className="home-hero-content relative z-10 mx-auto w-full max-w-xl text-center">

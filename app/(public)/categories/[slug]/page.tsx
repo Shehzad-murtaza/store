@@ -5,6 +5,7 @@ import { ProductGridSkeleton, ProductResults } from "@/components/catalog/Produc
 import { ResponsiveProductFilters } from "@/components/catalog/ResponsiveProductFilters";
 import { PublicBackButton } from "@/components/layout/PublicBackButton";
 import { parseCatalogFilters, type CatalogSearchParams } from "@/lib/catalog/filters";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { getCategoryBySlug } from "@/lib/supabase/catalog";
 
 type PageProps = { params: Promise<{ slug: string }>; searchParams: Promise<CatalogSearchParams> };
@@ -12,7 +13,28 @@ type PageProps = { params: Promise<{ slug: string }>; searchParams: Promise<Cata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
-  return { title: category?.name ?? "Category", description: category?.description ?? undefined };
+  if (!category) return { title: "Category not found", robots: { index: false, follow: false } };
+
+  const description = category.description?.replace(/\s+/g, " ").trim().slice(0, 160) || `Browse ${category.name} at ${SITE_NAME}.`;
+
+  return {
+    title: category.name,
+    description,
+    alternates: { canonical: `/categories/${category.slug}` },
+    openGraph: {
+      type: "website",
+      title: category.name,
+      description,
+      url: `/categories/${category.slug}`,
+      images: category.image_url ? [{ url: category.image_url, alt: category.name }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: category.name,
+      description,
+      images: category.image_url ? [category.image_url] : undefined,
+    },
+  };
 }
 
 export default async function CategoryDetailPage({ params, searchParams }: PageProps) {
@@ -21,8 +43,17 @@ export default async function CategoryDetailPage({ params, searchParams }: PageP
   if (!category) notFound();
 
   const filters = parseCatalogFilters(search);
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Categories", item: `${SITE_URL}/categories` },
+      { "@type": "ListItem", position: 2, name: category.name, item: `${SITE_URL}/categories/${category.slug}` },
+    ],
+  };
 
   return <main className="mx-auto min-h-[60vh] max-w-[1280px] px-4 py-7 sm:px-6 sm:py-11 lg:px-8">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
     <div className="mb-5 sm:mb-6"><PublicBackButton fallbackHref="/categories" /></div>
     <header className="mb-5 max-w-3xl sm:mb-6">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Category</p>
