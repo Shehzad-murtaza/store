@@ -11,6 +11,16 @@ export function ProductCard({ product, priority = false }: { product: ProductCar
   const hasDiscount = product.discount_price !== null;
   const outOfStock = isOutOfStock(product);
   const lowStock = !outOfStock && product.stock_quantity <= 5;
+  const item = {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    price: product.price,
+    discountPrice: product.discount_price,
+    imageUrl: product.primary_image_url,
+    stock: product.stock_quantity,
+    sold: product.is_sold,
+  };
 
   return (
     <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-[#eaeaea] bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-md">
@@ -22,14 +32,11 @@ export function ProductCard({ product, priority = false }: { product: ProductCar
             fill
             priority={priority}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+            className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-[1.025] sm:p-2"
           /> : <div className="flex h-full flex-col items-center justify-center gap-2 text-[#999]">
             <ImageIcon size={22} strokeWidth={1.4} />
             <span className="text-xs">Image coming soon</span>
           </div>}
-          {outOfStock
-            ? <span className="absolute left-2.5 top-2.5 rounded-md bg-[#1a1a1a] px-2 py-1 text-[9px] font-medium uppercase tracking-[0.1em] text-white sm:left-3 sm:top-3 sm:px-2.5 sm:text-[10px]">Sold out</span>
-            : hasDiscount && <span className="absolute left-2.5 top-2.5 rounded-md bg-[#f5f2e9] px-2 py-1 text-[9px] font-medium uppercase tracking-[0.1em] text-[#786536] sm:left-3 sm:top-3 sm:px-2.5 sm:text-[10px]">Sale</span>}
         </div>
         <div className="min-w-0 p-3 pb-2 sm:p-4 sm:pb-2.5 lg:px-5 lg:pt-5">
           {product.category && <p className="mb-1 text-[9px] font-medium uppercase tracking-[0.1em] text-[#777] sm:mb-1.5 sm:text-[10px] sm:tracking-[0.13em]">{product.category.name}</p>}
@@ -40,32 +47,18 @@ export function ProductCard({ product, priority = false }: { product: ProductCar
           {lowStock && <p className="mt-1.5 text-[10px] font-medium text-[#8a6b28] sm:text-[11px]">Only {product.stock_quantity} left</p>}
         </div>
       </Link>
-      <WishlistButton
-        className="wishlist-fab"
-        item={{
-          id: product.id,
-          slug: product.slug,
-          name: product.name,
-          price: product.price,
-          discountPrice: product.discount_price,
-          imageUrl: product.primary_image_url,
-          stock: product.stock_quantity,
-          sold: product.is_sold,
-        }}
-      />
+      <div className="flex items-center justify-between gap-2 px-3 sm:px-4 lg:px-5">
+        {outOfStock || hasDiscount ? <span className={`inline-flex min-h-6 items-center rounded-md px-2 py-1 text-[9px] font-medium uppercase tracking-[0.1em] ${outOfStock ? "bg-[#f1f1f1] text-[#666]" : "bg-[#f5f2e9] text-[#786536]"}`}>
+          {outOfStock ? "Sold out" : "Sale"}
+        </span> : <span aria-hidden="true" />}
+        <WishlistButton className="wishlist-card-button" item={item} />
+      </div>
       <div className="px-3 pb-3 sm:px-4 sm:pb-4 lg:px-5 lg:pb-5">
         <AddToCartButton
           compact
           className="w-full"
           product={{
-            id: product.id,
-            slug: product.slug,
-            name: product.name,
-            price: product.price,
-            discountPrice: product.discount_price,
-            imageUrl: product.primary_image_url,
-            stock: product.stock_quantity,
-            sold: product.is_sold,
+            ...item,
           }}
         />
       </div>

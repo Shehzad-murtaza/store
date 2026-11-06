@@ -78,7 +78,7 @@ export function Header() {
         <ThemeToggle />
         <button
           type="button"
-          className="inline-flex size-10 items-center justify-center rounded-lg text-[#111] transition hover:bg-[#f0f0f0] md:hidden"
+          className="public-header-menu inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[#111] transition hover:bg-[#f0f0f0] md:hidden"
           aria-label={open ? "Close navigation" : "Open navigation"}
           aria-expanded={open}
           onClick={() => setOpen(!open)}

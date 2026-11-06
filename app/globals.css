@@ -101,9 +101,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .order-timeline-step.done .order-timeline-title { color: #333; }
 .order-timeline-step.current .order-timeline-title { color: #111; font-weight: 600; }
 .order-timeline-cancelled { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; background: #fbeeed; padding: 12px 14px; color: #a13b32; font-size: 13px; font-weight: 500; }
-.wishlist-fab { position: absolute; right: 10px; top: 10px; z-index: 10; display: inline-flex; height: 32px; width: 32px; align-items: center; justify-content: center; border-radius: 999px; border: 1px solid #eaeaea; background: rgba(255,255,255,.9); color: #666; box-shadow: 0 1px 3px rgba(0,0,0,.08); backdrop-filter: blur(4px); transition: background .15s, color .15s; }
-.wishlist-fab:hover { background: #fff; color: #111; }
-.wishlist-fab.is-active { color: #111; }
+.wishlist-card-button { display: inline-flex; width: 32px; height: 32px; flex: 0 0 auto; align-items: center; justify-content: center; border: 1px solid #eaeaea; border-radius: 999px; background: #fff; color: #666; transition: background .15s, color .15s, border-color .15s; }
+.wishlist-card-button:hover { background: #f5f5f5; color: #111; }
+.wishlist-card-button.is-active { color: #111; }
 .wishlist-detail-btn { display: inline-flex; width: 50px; flex: 0 0 50px; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #deded6; background: #fff; color: #272a24; transition: background .15s, color .15s; }
 .wishlist-detail-btn:hover { background: #f5f4ef; }
 .wishlist-detail-btn.is-active { color: #111; }
@@ -143,7 +143,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .analytics-split { display: flex; height: 8px; overflow: hidden; border-radius: 999px; background: #f1f1ee; }
 .analytics-split-paid { background: #587b5e; }
 .analytics-split-due { background: #b98428; }
-@media (min-width: 640px) { .wishlist-fab { right: 12px; top: 12px; height: 36px; width: 36px; } }
 .admin-toggle { position: relative; display: inline-flex; cursor: pointer; align-items: center; gap: 9px; font-size: 13px; color: #444; }
 .admin-toggle input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .admin-toggle-track { display: flex; width: 36px; height: 21px; align-items: center; border-radius: 999px; background: #d7d7d4; padding: 2px; transition: background .15s; }
@@ -312,9 +311,9 @@ html.dark .order-timeline-title { color: #9a9a9a; }
 html.dark .order-timeline-step.done .order-timeline-title { color: #cfcfcf; }
 html.dark .order-timeline-step.current .order-timeline-title { color: #fff; }
 html.dark .order-timeline-cancelled { background: #351d1b; color: #f0aaa3; }
-html.dark .wishlist-fab { border-color: #333; background: rgba(22,22,22,.9); color: #b5b5b5; }
-html.dark .wishlist-fab:hover { background: #1c1c1c; color: #fff; }
-html.dark .wishlist-fab.is-active { color: #fff; }
+html.dark .wishlist-card-button { border-color: #333; background: #161616; color: #b5b5b5; }
+html.dark .wishlist-card-button:hover { background: #1c1c1c; color: #fff; }
+html.dark .wishlist-card-button.is-active { color: #fff; }
 html.dark .wishlist-detail-btn { border-color: #333; background: #161616; color: #ddd; }
 html.dark .wishlist-detail-btn:hover { background: #1e1e1e; }
 html.dark .wishlist-detail-btn.is-active { color: #fff; }
@@ -503,7 +502,15 @@ html.dark .gallery-count-pill {
 html.dark .product-gallery-thumbnails { scrollbar-color: #555 transparent; }
 @media (max-width: 360px) {
   .public-header-brand .brand-logo-image { width: 96px !important; }
-  .public-header-controls { gap: 4px; }
+  .public-header-controls { gap: 2px; }
+  .public-header-controls .public-header-account,
+  .public-header-controls .public-header-wishlist,
+  .public-header-controls .public-header-cart,
+  .public-header-controls .public-header-menu,
+  .public-header-controls > button[aria-label="Toggle color theme"] { width: 32px; height: 32px; }
+  .public-header-controls .public-header-account svg,
+  .public-header-controls .public-header-wishlist svg,
+  .public-header-controls .public-header-cart svg { width: 17px; height: 17px; }
   .public-header-dashboard { padding-inline: 8px; font-size: 12px; }
 }
 
@@ -515,6 +522,12 @@ html.dark #home-hero { background-color: #0c0c0c; color: #fff; }
 html.dark #home-hero .home-hero-heading { color: #fff; }
 html.dark #home-hero .home-hero-muted { color: rgb(255 255 255 / 0.7); }
 html.dark #home-hero .home-hero-explore { background-color: #fff; color: #111; }
+.home-hero-product-card { background: #fff; border-color: #eaeaea; color: #111; }
+.home-hero-product-image { background: #f1f1ef; }
+html.dark .home-hero-product-card { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .home-hero-product-image { background: #202020; }
+html.dark .home-hero-product-card [class~="bg-white"] { background: rgb(22 22 22 / 0.82) !important; border-color: #3a3a3a !important; color: #f5f5f5 !important; }
+html.dark .home-hero-product-card [class~="border-[#eaeaea]"] { border-color: #383838 !important; color: #eee !important; }
 
 #featured { background-color: #fafafa; }
 html.dark #featured { background-color: #0c0c0c; }

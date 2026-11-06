@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
+import { ProductDescription } from "@/components/catalog/ProductDescription";
 import { AddToCartButton } from "@/components/catalog/AddToCartButton";
 import { WhatsAppButton } from "@/components/catalog/WhatsAppButton";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
@@ -156,7 +157,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     {product.description && <section aria-labelledby="product-description-heading" className="mt-8 border-t border-[#eaeaea] pt-6 sm:mt-10 sm:pt-8">
       <div className="max-w-3xl">
         <h2 id="product-description-heading" className="text-base font-semibold tracking-[-0.02em] sm:text-lg">Description</h2>
-        <p className="mt-3 whitespace-pre-line break-words text-sm leading-7 text-[#666] sm:mt-4 sm:text-[15px] sm:leading-8">{product.description}</p>
+          <ProductDescription description={product.description} />
       </div>
     </section>}
 

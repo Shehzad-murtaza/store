@@ -20,7 +20,7 @@ export function Footer() {
           <a href="https://wa.me/923260489379" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-black"><MessageCircle size={15} />WhatsApp</a>
         </div>
       </div>
-      <div className="border-t border-[#eaeaea] py-4 text-center text-xs text-[#777]">© 2025 SHEZY. All rights reserved.</div>
+      <div className="border-t border-[#eaeaea] py-4 text-center text-xs text-[#777]">© {new Date().getFullYear()} SHEZY. All rights reserved.</div>
     </footer>
   );
 }
