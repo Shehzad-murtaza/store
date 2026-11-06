@@ -23,6 +23,7 @@ function parsePrice(value: string): number | undefined {
 
 export function parseCatalogFilters(params: CatalogSearchParams): ParsedCatalogFilters {
   const category = first(params.category);
+  const searchTerm = first(params.q).trim();
   const minPriceInput = first(params.minPrice);
   const maxPriceInput = first(params.maxPrice);
   const availabilityParam = first(params.availability);
@@ -33,6 +34,7 @@ export function parseCatalogFilters(params: CatalogSearchParams): ParsedCatalogF
   return {
     category: category || undefined,
     categorySlug: category || undefined,
+    searchTerm: searchTerm || undefined,
     minPrice: parsePrice(minPriceInput),
     maxPrice: parsePrice(maxPriceInput),
     availability: availabilityValue === "all" ? undefined : availabilityValue,

@@ -61,7 +61,7 @@ export default async function CategoryDetailPage({ params, searchParams }: PageP
       {category.description && <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#666]">{category.description}</p>}
     </header>
     <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
-      <ResponsiveProductFilters categories={[]} filters={filters} action={`/categories/${category.slug}`} showCategory={false} />
+      <Suspense fallback={<div aria-label="Loading filters" className="h-10 w-24 animate-pulse rounded-lg border border-[#eaeaea] bg-white lg:h-[380px] lg:w-full lg:rounded-xl" />}><ResponsiveProductFilters categories={[]} action={`/categories/${category.slug}`} showCategory={false} /></Suspense>
       <div className="min-w-0 w-full"><Suspense fallback={<ProductGridSkeleton />}><ProductResults filters={filters} categoryId={category.id} clearHref={`/categories/${category.slug}`} includeCategory={false} /></Suspense></div>
     </div>
   </main>;

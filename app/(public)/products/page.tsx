@@ -4,7 +4,6 @@ import { ProductGridSkeleton, ProductResults } from "@/components/catalog/Produc
 import { ResponsiveProductFilters } from "@/components/catalog/ResponsiveProductFilters";
 import { parseCatalogFilters, type CatalogSearchParams } from "@/lib/catalog/filters";
 import { getCategories } from "@/lib/supabase/catalog";
-import type { ParsedCatalogFilters } from "@/lib/catalog/filters";
 
 export const metadata: Metadata = {
   title: "All products",
@@ -12,9 +11,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/products" },
 };
 
-async function ProductFilterPanel({ filters }: { filters: ParsedCatalogFilters }) {
+async function ProductFilterPanel() {
   const categories = await getCategories();
-  return <ResponsiveProductFilters categories={categories} filters={filters} action="/products" />;
+  return <ResponsiveProductFilters categories={categories} action="/products" />;
 }
 
 function ProductFilterSkeleton() {
@@ -32,7 +31,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       <p className="mt-3 text-sm leading-6 text-[#666]">A considered edit of pieces for everyday living.</p>
     </header>
     <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
-      <Suspense fallback={<ProductFilterSkeleton />}><ProductFilterPanel filters={filters} /></Suspense>
+      <Suspense fallback={<ProductFilterSkeleton />}><ProductFilterPanel /></Suspense>
       <div className="min-w-0 w-full"><Suspense fallback={<ProductGridSkeleton />}><ProductResults filters={filters} clearHref="/products" /></Suspense></div>
     </div>
   </main>;

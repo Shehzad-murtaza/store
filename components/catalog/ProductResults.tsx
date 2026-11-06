@@ -6,6 +6,7 @@ import { getProducts } from "@/lib/supabase/catalog";
 function hasActiveFilters(filters: ParsedCatalogFilters, includeCategory: boolean) {
   return Boolean(
     (includeCategory && filters.category) ||
+    filters.searchTerm ||
     filters.minPriceInput.trim() !== "" ||
     filters.maxPriceInput.trim() !== "" ||
     filters.availability ||
