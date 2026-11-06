@@ -84,11 +84,21 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           <div className="flex items-center justify-between"><dt className="text-[#666]">Delivery</dt><dd className="font-medium">{Number(order.shipping_fee) === 0 ? "Free" : formatPKR(order.shipping_fee)}</dd></div>
           <div className="flex items-center justify-between border-t border-[#eaeaea] pt-2 text-base"><dt className="font-semibold">Total</dt><dd className="font-semibold">{formatPKR(order.total)}</dd></div>
           <div className="flex items-center justify-between text-xs"><dt className="text-[#666]">{PAYMENT_METHOD_LABELS[order.payment_method]}</dt><dd className="text-[#666]">{PAYMENT_STATUS_LABELS[order.payment_status]}</dd></div>
+          {Number(order.amount_paid) > 0 && <div className="flex items-center justify-between text-xs"><dt className="text-[#666]">Received</dt><dd className="text-[#666]">{formatPKR(order.amount_paid)}</dd></div>}
+          {order.tracking_number && <div className="flex items-center justify-between text-xs"><dt className="text-[#666]">Tracking</dt><dd className="text-[#666]">{order.tracking_number}</dd></div>}
         </dl>
       </div>
 
       <div className="no-print space-y-6">
-        <OrderStatusControl orderId={order.id} status={order.status} paymentStatus={order.payment_status} />
+        <OrderStatusControl
+          orderId={order.id}
+          status={order.status}
+          paymentStatus={order.payment_status}
+          amountPaid={Number(order.amount_paid)}
+          total={Number(order.total)}
+          trackingNumber={order.tracking_number}
+          adminNotes={order.admin_notes}
+        />
         <section className="admin-form-section">
           <h2>Contact customer</h2>
           <p className="mt-2 text-xs leading-5 text-[#777]">Continue this order on WhatsApp to confirm and deliver it manually.</p>

@@ -39,6 +39,11 @@ export function OrderSummary({ order, items }: { order: Order; items: OrderItem[
     <section className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">
       <h3 className="text-sm font-semibold tracking-[-0.02em]">Order status</h3>
       <div className="mt-5"><OrderTimeline status={order.status} /></div>
+      {(order.tracking_number || order.shipped_at || order.delivered_at) && <dl className="mt-5 space-y-2 border-t border-[#eaeaea] pt-4 text-xs">
+        {order.tracking_number && <div className="flex items-center justify-between gap-3"><dt className="text-[#777]">Tracking number</dt><dd className="font-medium text-[#222]">{order.tracking_number}</dd></div>}
+        {order.shipped_at && <div className="flex items-center justify-between gap-3"><dt className="text-[#777]">Shipped</dt><dd className="text-[#444]">{formatDateTime(order.shipped_at)}</dd></div>}
+        {order.delivered_at && <div className="flex items-center justify-between gap-3"><dt className="text-[#777]">Delivered</dt><dd className="text-[#444]">{formatDateTime(order.delivered_at)}</dd></div>}
+      </dl>}
     </section>
 
     <div className="grid gap-6 sm:grid-cols-2">
@@ -60,6 +65,7 @@ export function OrderSummary({ order, items }: { order: Order; items: OrderItem[
           <div>
             <p className="text-sm font-medium">{PAYMENT_METHOD_LABELS[order.payment_method]}</p>
             <p className="mt-1 text-xs text-[#777]">{PAYMENT_STATUS_LABELS[order.payment_status]}</p>
+            {order.payment_status === "partial" && <p className="mt-1 text-xs text-[#777]">{formatPKR(order.amount_paid)} received · {formatPKR(Number(order.total) - Number(order.amount_paid))} due</p>}
           </div>
         </div>
       </section>

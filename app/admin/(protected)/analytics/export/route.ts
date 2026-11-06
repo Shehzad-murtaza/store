@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     .order("created_at", { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const header = ["Order", "Date", "Customer", "Phone", "City", "Items", "Payment method", "Payment status", "Status", "Subtotal", "Shipping", "Total"];
+  const header = ["Order", "Date", "Customer", "Phone", "City", "Items", "Payment method", "Payment status", "Amount paid", "Order status", "Subtotal", "Shipping", "Total", "Balance"];
   const rows = ((data ?? []) as unknown as ExportRow[]).map(({ order_items, ...order }) => [
     order.order_number,
     new Date(order.created_at).toISOString(),
@@ -34,10 +34,12 @@ export async function GET(request: Request) {
     order_items?.[0]?.count ?? 0,
     PAYMENT_METHOD_LABELS[order.payment_method],
     PAYMENT_STATUS_LABELS[order.payment_status],
+    Number(order.amount_paid),
     orderStatusLabel(order.status),
     order.subtotal,
     order.shipping_fee,
     order.total,
+    Math.max(Number(order.total) - Number(order.amount_paid), 0),
   ]);
 
   const csv = [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");

@@ -77,7 +77,7 @@ export interface AnalyticsData {
   topProducts: TopProductRow[];
 }
 
-type OrderRow = Pick<Order, "id" | "status" | "payment_status" | "total" | "created_at">;
+type OrderRow = Pick<Order, "id" | "status" | "payment_status" | "total" | "amount_paid" | "created_at">;
 type ItemRow = Pick<OrderItem, "product_id" | "product_name" | "product_slug" | "quantity" | "line_total">;
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -127,7 +127,7 @@ export async function getAnalytics(range: AnalyticsRange): Promise<AnalyticsData
 
   const { data, error } = await supabase
     .from("orders")
-    .select("id, status, payment_status, total, created_at")
+    .select("id, status, payment_status, total, amount_paid, created_at")
     .gte("created_at", from.toISOString())
     .order("created_at", { ascending: true });
   if (error) throw new Error(`Could not load analytics: ${error.message}`);
@@ -136,7 +136,7 @@ export async function getAnalytics(range: AnalyticsRange): Promise<AnalyticsData
   const active = orders.filter((order) => order.status !== "cancelled");
 
   const revenue = active.reduce((sum, order) => sum + Number(order.total), 0);
-  const paidRevenue = active.filter((order) => order.payment_status === "paid").reduce((sum, order) => sum + Number(order.total), 0);
+  const paidRevenue = active.reduce((sum, order) => sum + (order.payment_status === "paid" ? Number(order.total) : Number(order.amount_paid)), 0);
 
   const buckets = new Map(buildBuckets(range, now).map((key) => [key, { revenue: 0, orders: 0 }]));
   for (const order of active) {

@@ -83,6 +83,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .status-pill.progress { background: #eaf1fb; color: #2f5c96; }
 .status-pill.done { background: #eff4ee; color: #46624a; }
 .status-pill.cancelled { background: #fbeeed; color: #a13b32; }
+.pay-toggle { display: inline-flex; width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+.pay-toggle button { flex: 1 1 0; height: 34px; border-radius: 7px; color: #666; font-size: 11px; font-weight: 500; transition: background .15s, color .15s; }
+.pay-toggle button:hover { background: #fafafa; }
+.pay-toggle button[aria-pressed="true"] { background: #f0f0f0; color: #222; }
+.pay-toggle button[aria-pressed="true"].paid { background: #eff4ee; color: #46624a; }
 .cart-count-badge { position: absolute; top: -5px; right: -5px; display: inline-flex; min-width: 17px; height: 17px; align-items: center; justify-content: center; border-radius: 999px; background: #1a1a1a; padding: 0 4px; color: #fff; font-size: 10px; font-weight: 600; line-height: 1; }
 .order-timeline { display: grid; gap: 0; }
 .order-timeline-step { position: relative; display: flex; align-items: center; gap: 13px; padding-bottom: 20px; }
@@ -276,6 +281,10 @@ html.dark .status-pill.pending { background: #33280f; color: #e3c07a; }
 html.dark .status-pill.progress { background: #1b2739; color: #a7c4e8; }
 html.dark .status-pill.done { background: #1c2b20; color: #a8d2ae; }
 html.dark .status-pill.cancelled { background: #351d1b; color: #f0aaa3; }
+html.dark .pay-toggle button { color: #a3a3a3; }
+html.dark .pay-toggle button:hover { background: #1c1c1c; }
+html.dark .pay-toggle button[aria-pressed="true"] { background: #292929; color: #f0f0f0; }
+html.dark .pay-toggle button[aria-pressed="true"].paid { background: #1c2b20; color: #a8d2ae; }
 html.dark .analytics-range-tabs { background: #161616; border-color: #2a2a2a; }
 html.dark .analytics-range-tab { color: #a3a3a3; }
 html.dark .analytics-range-tab:hover { background: #242424; color: #fff; }

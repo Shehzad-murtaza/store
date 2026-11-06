@@ -22,8 +22,23 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   unpaid: "Unpaid",
+  partial: "Partially paid",
   paid: "Paid",
 };
+
+/** Derives the payment status from how much has actually been received. */
+export function paymentStatusFromAmount(total: number, amountPaid: number): PaymentStatus {
+  if (amountPaid <= 0) return "unpaid";
+  if (amountPaid >= total) return "paid";
+  return "partial";
+}
+
+/** The next step in the fulfilment flow, or null when the order is finished. */
+export function nextOrderStatus(status: OrderStatus): OrderStatus | null {
+  const index = ORDER_PROGRESS.indexOf(status);
+  if (index < 0 || index >= ORDER_PROGRESS.length - 1) return null;
+  return ORDER_PROGRESS[index + 1];
+}
 
 export function orderStatusLabel(status: OrderStatus): string {
   return ORDER_STATUSES.find((entry) => entry.value === status)?.label ?? status;

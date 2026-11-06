@@ -35,7 +35,7 @@ export interface ProductImage {
 
 export type OrderStatus = "pending" | "confirmed" | "packed" | "shipped" | "delivered" | "cancelled";
 export type PaymentMethod = "cod" | "bank";
-export type PaymentStatus = "unpaid" | "paid";
+export type PaymentStatus = "unpaid" | "partial" | "paid";
 export type ReviewStatus = "pending" | "approved" | "rejected";
 
 export interface Order {
@@ -49,10 +49,15 @@ export interface Order {
   notes: string | null;
   payment_method: PaymentMethod;
   payment_status: PaymentStatus;
+  amount_paid: number;
   status: OrderStatus;
+  tracking_number: string | null;
+  admin_notes: string | null;
   subtotal: number;
   shipping_fee: number;
   total: number;
+  shipped_at: string | null;
+  delivered_at: string | null;
   created_at: string;
   updated_at: string;
 }

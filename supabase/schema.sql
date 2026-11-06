@@ -199,7 +199,7 @@ create table if not exists public.orders (
   city text not null,
   notes text,
   payment_method text not null check (payment_method in ('cod', 'bank')),
-  payment_status text not null default 'unpaid' check (payment_status in ('unpaid', 'paid')),
+  payment_status text not null default 'unpaid' check (payment_status in ('unpaid', 'partial', 'paid')),
   status text not null default 'pending' check (status in ('pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled')),
   subtotal numeric(12, 2) not null default 0,
   shipping_fee numeric(12, 2) not null default 0,
@@ -222,6 +222,19 @@ create table if not exists public.order_items (
 -- Links an order to the signed-in customer, when they ordered with an account.
 -- Guest orders leave this null.
 alter table public.orders add column if not exists user_id uuid references auth.users(id) on delete set null;
+
+-- Fulfilment upgrades: courier tracking, internal admin notes, partial payments
+-- and the timestamps used on the customer-facing timeline.
+alter table public.orders add column if not exists tracking_number text;
+alter table public.orders add column if not exists admin_notes text;
+alter table public.orders add column if not exists amount_paid numeric(12, 2) not null default 0;
+alter table public.orders add column if not exists shipped_at timestamptz;
+alter table public.orders add column if not exists delivered_at timestamptz;
+
+-- Payments can now be partially received, so the status gains a 'partial' value.
+alter table public.orders drop constraint if exists orders_payment_status_check;
+alter table public.orders add constraint orders_payment_status_check
+  check (payment_status in ('unpaid', 'partial', 'paid'));
 
 create index if not exists orders_user_id_idx on public.orders(user_id);
 create index if not exists orders_created_at_idx on public.orders(created_at desc);
@@ -366,7 +379,7 @@ declare
   v_result json;
 begin
   select json_build_object(
-    'order', to_jsonb(o),
+    'order', to_jsonb(o) - 'admin_notes' - 'user_id',
     'items', coalesce(
       (select json_agg(to_jsonb(i) order by i.id) from public.order_items i where i.order_id = o.id),
       '[]'::json
