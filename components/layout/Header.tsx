@@ -1,98 +1,129 @@
 "use client";
 
+import React, { useState } from "react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
-import { BrandLogo } from "@/components/layout/BrandLogo";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { CartButton } from "@/components/cart/CartButton";
-import { WishlistHeaderButton } from "@/components/wishlist/WishlistHeaderButton";
-import { AccountHeaderButton } from "@/components/account/AccountHeaderButton";
-import { createClient } from "@/lib/supabase/client";
+import { Menu, X, ShoppingBag, Heart, User, Search } from "lucide-react";
 
-const links = [
-  { label: "Home", href: "/" },
-  { label: "Categories", href: "/categories" },
-  { label: "Products", href: "/products" },
-  { label: "Contact", href: "/contact" },
-];
-
-export function Header() {
-  const [open, setOpen] = useState(false);
-  const [showDashboard, setShowDashboard] = useState(false);
+export default function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === "/";
-  const authEventRevision = useRef(0);
 
-  useEffect(() => {
-    const supabase = createClient();
-    let cancelled = false;
+  const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
-    // Only the store owner should see the admin dashboard link.
-    async function resolveAdmin(userId: string | undefined): Promise<boolean> {
-      if (!userId) return false;
-      const { data } = await supabase.rpc("is_admin");
-      return Boolean(data);
-    }
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      authEventRevision.current += 1;
-      const revision = authEventRevision.current;
-      if (event === "SIGNED_OUT" || !session?.user) {
-        setShowDashboard(false);
-        return;
-      }
-      void resolveAdmin(session.user.id).then((isAdmin) => {
-        if (!cancelled && authEventRevision.current === revision) setShowDashboard(isAdmin);
-      });
-    });
-
-    const revisionAtRequest = authEventRevision.current;
-    void supabase.auth.getUser().then(async ({ data: { user } }) => {
-      const isAdmin = await resolveAdmin(user?.id);
-      if (!cancelled && authEventRevision.current === revisionAtRequest) setShowDashboard(isAdmin);
-    });
-
-    return () => { cancelled = true; subscription.unsubscribe(); };
-  }, []);
-
-  function isActive(href: string) {
-    if (href === "/") return pathname === "/";
-    return pathname === href || pathname.startsWith(`${href}/`);
-  }
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Products", href: "/products" },
+    { name: "Categories", href: "/categories" },
+    { name: "Contact", href: "/contact" },
+  ];
 
   return (
-    <>
-    <header className={`glass-site-header fixed inset-x-0 top-0 z-50 border-b ${isHome ? "home-hero-header border-transparent bg-transparent" : "border-[#eaeaea]"}`}>
-      <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" aria-label="SHEZY home" className="public-header-brand inline-flex shrink-0 items-center"><BrandLogo width={126} /></Link>
-        <nav className="hidden items-center gap-9 md:flex" aria-label="Main navigation">
-          {links.map((link) => <Link key={link.label} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`text-[13px] transition-colors hover:text-black ${isActive(link.href) ? "font-semibold text-[#111]" : "text-[#555]"}`}>{link.label}</Link>)}
-        </nav>
-        <div className="public-header-controls flex items-center gap-2">
-        {showDashboard && <Link href="/admin" className="public-header-dashboard inline-flex h-10 items-center rounded-lg px-3 text-sm font-medium text-[#444] transition-colors hover:bg-[#f0f0f0] hover:text-[#111]">Dashboard</Link>}
-        <AccountHeaderButton />
-        <WishlistHeaderButton />
-        <CartButton />
-        <ThemeToggle />
-        <button
-          type="button"
-          className="public-header-menu inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[#111] transition hover:bg-[#f0f0f0] md:hidden"
-          aria-label={open ? "Close navigation" : "Open navigation"}
-          aria-expanded={open}
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button></div>
-      </div>
-      {open && <nav className="mobile-navigation-panel border-t border-[#eaeaea] px-4 py-3 md:hidden" aria-label="Mobile navigation">
-        <div className="mx-auto grid max-w-[1280px] gap-1 sm:px-2">
-          {links.map((link) => <Link key={link.label} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} onClick={() => setOpen(false)} className={`rounded-lg px-3 py-3 text-sm transition-colors hover:bg-[#f5f5f5] ${isActive(link.href) ? "bg-[#f5f5f5] font-medium text-[#111]" : "text-[#444]"}`}>{link.label}</Link>)}
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          
+          {/* Mobile Hamburger Menu Button */}
+          <div className="flex items-center lg:hidden">
+            <button
+              onClick={toggleMenu}
+              className="text-gray-600 hover:text-black focus:outline-none p-2 -ml-2"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          </div>
+
+          {/* Logo */}
+          <div className="flex-shrink-0 flex items-center justify-center lg:justify-start flex-1 lg:flex-none">
+            <Link href="/" className="text-2xl font-black tracking-tighter text-black">
+              SHEZY STORE
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex lg:gap-x-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`text-sm font-semibold transition-colors hover:text-black ${
+                  pathname === link.href ? "text-black border-b-2 border-black pb-1" : "text-gray-500"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Action Icons */}
+          <div className="flex items-center justify-end gap-x-4 lg:gap-x-6">
+            <button className="hidden sm:flex text-gray-600 hover:text-black transition-colors">
+              <Search className="h-5 w-5" />
+            </button>
+            <Link href="/account" className="text-gray-600 hover:text-black transition-colors">
+              <User className="h-5 w-5" />
+            </Link>
+            <Link href="/wishlist" className="hidden sm:flex text-gray-600 hover:text-black transition-colors relative">
+              <Heart className="h-5 w-5" />
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white">
+                0
+              </span>
+            </Link>
+            <Link href="/cart" className="text-gray-600 hover:text-black transition-colors relative flex items-center">
+              <ShoppingBag className="h-5 w-5" />
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white">
+                0
+              </span>
+            </Link>
+          </div>
         </div>
-      </nav>}
+      </div>
+
+      {/* Mobile Menu Drawer (Slide-over) */}
+      <div
+        className={`fixed inset-0 z-50 bg-black/50 transition-opacity lg:hidden ${
+          isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        onClick={toggleMenu}
+      >
+        <div
+          className={`fixed inset-y-0 left-0 w-3/4 max-w-sm bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex h-16 items-center justify-between px-4 border-b">
+            <span className="text-xl font-bold tracking-tight">Menu</span>
+            <button onClick={toggleMenu} className="text-gray-500 hover:text-black p-2 rounded-md bg-gray-50">
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          
+          <nav className="flex flex-col p-4 gap-y-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={toggleMenu}
+                className={`text-lg font-medium p-3 rounded-md transition-colors ${
+                  pathname === link.href ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100 hover:text-black"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+          
+          <div className="absolute bottom-0 w-full border-t p-4 bg-gray-50">
+            <Link href="/wishlist" onClick={toggleMenu} className="flex items-center gap-x-3 text-gray-700 p-3 font-semibold hover:bg-gray-200 rounded-md transition">
+              <Heart className="h-5 w-5" /> Wishlist
+            </Link>
+            <Link href="/contact" onClick={toggleMenu} className="flex items-center gap-x-3 text-gray-700 p-3 font-semibold hover:bg-gray-200 rounded-md transition mt-2">
+               Help & Support
+            </Link>
+          </div>
+        </div>
+      </div>
     </header>
-    {!isHome && <div aria-hidden="true" className="h-[68px]" />}
-    </>
   );
 }
