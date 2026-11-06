@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Truck, Wallet } from "lucide-react";
+import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import { formatDateTime, formatPKR } from "@/lib/catalog/format";
 import { orderStatusLabel, orderStatusTone, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS } from "@/lib/catalog/orders";
 import type { Order, OrderItem } from "@/types";
@@ -33,6 +34,11 @@ export function OrderSummary({ order, items }: { order: Order; items: OrderItem[
         <div className="flex items-center justify-between"><dt className="text-[#666]">Delivery</dt><dd className="font-medium">{Number(order.shipping_fee) === 0 ? "Free" : formatPKR(order.shipping_fee)}</dd></div>
         <div className="flex items-center justify-between border-t border-[#eaeaea] pt-3 text-base"><dt className="font-semibold">Total</dt><dd className="font-semibold">{formatPKR(order.total)}</dd></div>
       </dl>
+    </section>
+
+    <section className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">
+      <h3 className="text-sm font-semibold tracking-[-0.02em]">Order status</h3>
+      <div className="mt-5"><OrderTimeline status={order.status} /></div>
     </section>
 
     <div className="grid gap-6 sm:grid-cols-2">

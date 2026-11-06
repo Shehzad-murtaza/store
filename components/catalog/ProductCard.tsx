@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ImageIcon } from "lucide-react";
 import { AddToCartButton } from "@/components/catalog/AddToCartButton";
+import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import type { ProductCardData } from "@/lib/supabase/catalog";
 import { formatPKR } from "@/lib/catalog/format";
 import { isOutOfStock } from "@/lib/catalog/orders";
@@ -12,7 +13,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const lowStock = !outOfStock && product.stock_quantity <= 5;
 
   return (
-    <article className="group flex min-w-0 flex-col overflow-hidden rounded-xl border border-[#eaeaea] bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-md">
+    <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-[#eaeaea] bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-md">
       <Link href={`/products/${product.slug}`} className="flex min-w-0 flex-1 flex-col">
         <div className="relative aspect-square overflow-hidden bg-[#f1f1ef] sm:aspect-[4/3]">
           {product.primary_image_url ? <Image
@@ -38,6 +39,19 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           {lowStock && <p className="mt-1.5 text-[10px] font-medium text-[#8a6b28] sm:text-[11px]">Only {product.stock_quantity} left</p>}
         </div>
       </Link>
+      <WishlistButton
+        className="wishlist-fab"
+        item={{
+          id: product.id,
+          slug: product.slug,
+          name: product.name,
+          price: product.price,
+          discountPrice: product.discount_price,
+          imageUrl: product.primary_image_url,
+          stock: product.stock_quantity,
+          sold: product.is_sold,
+        }}
+      />
       <div className="px-3 pb-3 sm:px-4 sm:pb-4 lg:px-5 lg:pb-5">
         <AddToCartButton
           compact

@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { CartButton } from "@/components/cart/CartButton";
+import { WishlistHeaderButton } from "@/components/wishlist/WishlistHeaderButton";
 import { createClient } from "@/lib/supabase/client";
 
 const links = [
@@ -51,6 +52,7 @@ export function Header() {
         </nav>
         <div className="public-header-controls flex items-center gap-2">
         {showDashboard && <Link href="/admin" className="public-header-dashboard inline-flex h-10 items-center rounded-lg px-3 text-sm font-medium text-[#444] transition-colors hover:bg-[#f0f0f0] hover:text-[#111]">Dashboard</Link>}
+        <WishlistHeaderButton />
         <CartButton />
         <ThemeToggle />
         <button

@@ -12,6 +12,9 @@ export const ORDER_STATUSES: Array<{ value: OrderStatus; label: string; tone: "p
   { value: "cancelled", label: "Cancelled", tone: "cancelled" },
 ];
 
+/** Ordered fulfilment flow shown to customers (cancelled is handled separately). */
+export const ORDER_PROGRESS: OrderStatus[] = ["pending", "confirmed", "packed", "shipped", "delivered"];
+
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   cod: "Cash on delivery",
   bank: "Bank transfer",

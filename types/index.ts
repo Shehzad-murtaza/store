@@ -19,6 +19,8 @@ export interface Product {
   is_sold: boolean;
   is_featured: boolean;
   stock_quantity: number;
+  rating_average: number;
+  rating_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -34,6 +36,7 @@ export interface ProductImage {
 export type OrderStatus = "pending" | "confirmed" | "packed" | "shipped" | "delivered" | "cancelled";
 export type PaymentMethod = "cod" | "bank";
 export type PaymentStatus = "unpaid" | "paid";
+export type ReviewStatus = "pending" | "approved" | "rejected";
 
 export interface Order {
   id: string;
@@ -63,4 +66,16 @@ export interface OrderItem {
   unit_price: number;
   quantity: number;
   line_total: number;
+}
+
+export interface Review {
+  id: string;
+  product_id: string;
+  order_id: string | null;
+  customer_name: string;
+  rating: number;
+  comment: string | null;
+  status: ReviewStatus;
+  created_at: string;
+  updated_at: string;
 }

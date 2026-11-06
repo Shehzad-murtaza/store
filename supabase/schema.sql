@@ -321,3 +321,123 @@ $$;
 
 grant execute on function public.place_order(text, text, text, text, text, text, text, numeric, jsonb) to anon, authenticated;
 grant execute on function public.lookup_order(text, text) to anon, authenticated;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Verified-purchase reviews. A review can only be written by matching an order
+-- number with the phone used at checkout. Reviews start as 'pending' and become
+-- public once an admin approves them.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+alter table public.products add column if not exists rating_average numeric(3, 2) not null default 0;
+alter table public.products add column if not exists rating_count integer not null default 0;
+
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  order_id uuid references public.orders(id) on delete set null,
+  customer_name text not null,
+  rating integer not null check (rating between 1 and 5),
+  comment text,
+  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- One review per product per order.
+create unique index if not exists reviews_order_product_idx on public.reviews(order_id, product_id) where order_id is not null;
+create index if not exists reviews_product_status_idx on public.reviews(product_id, status);
+create index if not exists reviews_status_created_idx on public.reviews(status, created_at desc);
+
+drop trigger if exists reviews_set_updated_at on public.reviews;
+create trigger reviews_set_updated_at before update on public.reviews
+  for each row execute function public.set_updated_at();
+
+-- Keeps each product's public rating summary in sync with its approved reviews.
+create or replace function public.refresh_product_rating()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_product_id uuid;
+begin
+  v_product_id := coalesce(new.product_id, old.product_id);
+  update public.products p
+    set rating_average = coalesce((select round(avg(r.rating)::numeric, 2) from public.reviews r where r.product_id = v_product_id and r.status = 'approved'), 0),
+        rating_count = (select count(*) from public.reviews r where r.product_id = v_product_id and r.status = 'approved')
+    where p.id = v_product_id;
+  return null;
+end;
+$$;
+
+drop trigger if exists reviews_refresh_rating on public.reviews;
+create trigger reviews_refresh_rating after insert or update or delete on public.reviews
+  for each row execute function public.refresh_product_rating();
+
+alter table public.reviews enable row level security;
+
+grant select on public.reviews to anon, authenticated;
+grant insert, update, delete on public.reviews to authenticated;
+
+drop policy if exists "Public can read approved reviews" on public.reviews;
+create policy "Public can read approved reviews" on public.reviews
+  for select to anon, authenticated using (status = 'approved');
+drop policy if exists "Authenticated users manage reviews" on public.reviews;
+create policy "Authenticated users manage reviews" on public.reviews
+  for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+
+-- Submits a verified-purchase review after matching the order number and phone.
+create or replace function public.submit_review(
+  p_order_number text,
+  p_phone text,
+  p_product_id uuid,
+  p_rating integer,
+  p_comment text
+)
+returns json
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_order record;
+begin
+  if p_rating is null or p_rating < 1 or p_rating > 5 then
+    raise exception 'Choose a rating between 1 and 5';
+  end if;
+  if p_product_id is null then
+    raise exception 'Missing product';
+  end if;
+
+  select o.id, o.customer_name, o.status
+    into v_order
+    from public.orders o
+    where upper(trim(o.order_number)) = upper(trim(coalesce(p_order_number, '')))
+      and right(regexp_replace(o.customer_phone, '\D', '', 'g'), 10)
+          = right(regexp_replace(coalesce(p_phone, ''), '\D', '', 'g'), 10);
+
+  if not found then
+    raise exception 'We could not find that order. Please check the order number and phone.';
+  end if;
+  if v_order.status = 'cancelled' then
+    raise exception 'This order was cancelled and cannot be reviewed.';
+  end if;
+
+  if not exists (select 1 from public.order_items i where i.order_id = v_order.id and i.product_id = p_product_id) then
+    raise exception 'This product is not part of that order.';
+  end if;
+
+  insert into public.reviews (product_id, order_id, customer_name, rating, comment)
+  values (p_product_id, v_order.id, v_order.customer_name, p_rating, nullif(trim(coalesce(p_comment, '')), ''))
+  on conflict do nothing;
+
+  if not found then
+    raise exception 'You have already reviewed this product.';
+  end if;
+
+  return json_build_object('status', 'pending');
+end;
+$$;
+
+grant execute on function public.submit_review(text, text, uuid, integer, text) to anon, authenticated;

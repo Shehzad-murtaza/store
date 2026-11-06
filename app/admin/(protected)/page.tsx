@@ -13,11 +13,12 @@ export default function AdminHomePage() {
 }
 
 async function AdminDashboard() {
-  const { categoryCount, productCount, featuredCount, soldCount, recentProducts, orderCount, pendingOrders, revenue, recentOrders } = await getAdminOverview();
+  const { categoryCount, productCount, featuredCount, soldCount, recentProducts, orderCount, pendingOrders, revenue, pendingReviews, recentOrders } = await getAdminOverview();
 
   const sales = [
     { label: "Total orders", value: orderCount, icon: ReceiptText, href: "/admin/orders" },
     { label: "Pending orders", value: pendingOrders, icon: TrendingUp, href: "/admin/orders?status=pending" },
+    { label: "Pending reviews", value: pendingReviews, icon: Star, href: "/admin/reviews?status=pending" },
     { label: "Revenue", value: formatPKR(revenue), icon: Wallet, href: "/admin/orders" },
   ];
   const stats = [

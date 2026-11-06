@@ -1,10 +1,11 @@
 import { getProducts } from "@/lib/supabase/catalog";
 import { getOrderStats, getOrders } from "@/lib/supabase/order-data";
+import { getReviewStats } from "@/lib/supabase/review-data";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getAdminOverview() {
   const supabase = await createClient();
-  const [categories, products, featured, sold, recentProducts, orderStats, recentOrders] = await Promise.all([
+  const [categories, products, featured, sold, recentProducts, orderStats, recentOrders, reviewStats] = await Promise.all([
     supabase.from("categories").select("id", { count: "exact", head: true }),
     supabase.from("products").select("id", { count: "exact", head: true }),
     supabase.from("products").select("id", { count: "exact", head: true }).eq("is_featured", true),
@@ -12,6 +13,7 @@ export async function getAdminOverview() {
     getProducts({ sort: "newest", limit: 6 }),
     getOrderStats(),
     getOrders(),
+    getReviewStats(),
   ]);
 
   for (const result of [categories, products, featured, sold]) {
@@ -27,6 +29,7 @@ export async function getAdminOverview() {
     orderCount: orderStats.orderCount,
     pendingOrders: orderStats.pendingOrders,
     revenue: orderStats.revenue,
+    pendingReviews: reviewStats.pending,
     recentOrders: recentOrders.slice(0, 5),
   };
 }

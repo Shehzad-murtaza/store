@@ -84,6 +84,37 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .status-pill.done { background: #eff4ee; color: #46624a; }
 .status-pill.cancelled { background: #fbeeed; color: #a13b32; }
 .cart-count-badge { position: absolute; top: -5px; right: -5px; display: inline-flex; min-width: 17px; height: 17px; align-items: center; justify-content: center; border-radius: 999px; background: #1a1a1a; padding: 0 4px; color: #fff; font-size: 10px; font-weight: 600; line-height: 1; }
+.order-timeline { display: grid; gap: 0; }
+.order-timeline-step { position: relative; display: flex; align-items: center; gap: 13px; padding-bottom: 20px; }
+.order-timeline-step:last-child { padding-bottom: 0; }
+.order-timeline-step:not(:last-child)::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; background: #ececec; }
+.order-timeline-marker { position: relative; z-index: 1; display: inline-flex; height: 28px; width: 28px; flex: 0 0 28px; align-items: center; justify-content: center; border-radius: 999px; border: 2px solid #e6e6e6; background: #fff; color: #b0b0b0; }
+.order-timeline-dot { height: 8px; width: 8px; border-radius: 999px; background: currentColor; }
+.order-timeline-step.done .order-timeline-marker { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+.order-timeline-step.current .order-timeline-marker { border-color: #1a1a1a; background: #fff; color: #1a1a1a; }
+.order-timeline-title { font-size: 13px; font-weight: 500; color: #6b6b6b; }
+.order-timeline-step.done .order-timeline-title { color: #333; }
+.order-timeline-step.current .order-timeline-title { color: #111; font-weight: 600; }
+.order-timeline-cancelled { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; background: #fbeeed; padding: 12px 14px; color: #a13b32; font-size: 13px; font-weight: 500; }
+.wishlist-fab { position: absolute; right: 10px; top: 10px; z-index: 10; display: inline-flex; height: 32px; width: 32px; align-items: center; justify-content: center; border-radius: 999px; border: 1px solid #eaeaea; background: rgba(255,255,255,.9); color: #666; box-shadow: 0 1px 3px rgba(0,0,0,.08); backdrop-filter: blur(4px); transition: background .15s, color .15s; }
+.wishlist-fab:hover { background: #fff; color: #111; }
+.wishlist-fab.is-active { color: #111; }
+.wishlist-detail-btn { display: inline-flex; width: 50px; flex: 0 0 50px; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #deded6; background: #fff; color: #272a24; transition: background .15s, color .15s; }
+.wishlist-detail-btn:hover { background: #f5f4ef; }
+.wishlist-detail-btn.is-active { color: #111; }
+.rating-stars { display: inline-flex; align-items: center; gap: 2px; }
+.rating-star-filled { color: #a8873f; fill: currentColor; }
+.rating-star-empty { color: #d5d5d5; }
+.rating-pick { display: inline-flex; align-items: center; justify-content: center; padding: 2px; color: #cfcfcf; transition: color .15s, transform .15s; }
+.rating-pick:hover { transform: translateY(-1px); }
+.rating-pick.is-active { color: #a8873f; }
+.review-form { border: 1px solid #eaeaea; border-radius: 12px; background: #fff; padding: 20px; box-shadow: 0 1px 2px #00000008; }
+.review-form textarea.contact-input { min-height: 0; }
+.review-form-done { display: flex; align-items: flex-start; gap: 10px; border: 1px solid #dfe9df; border-radius: 12px; background: #f4f8f3; padding: 14px 16px; color: #38583d; font-size: 13px; line-height: 1.6; }
+.admin-content.admin-reviews-page { max-width: 1120px; margin: 32px auto; }
+.admin-reviews-table { min-width: 900px; }
+.admin-reviews-table td { vertical-align: top; }
+@media (min-width: 640px) { .wishlist-fab { right: 12px; top: 12px; height: 36px; width: 36px; } }
 .admin-toggle { position: relative; display: inline-flex; cursor: pointer; align-items: center; gap: 9px; font-size: 13px; color: #444; }
 .admin-toggle input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .admin-toggle-track { display: flex; width: 36px; height: 21px; align-items: center; border-radius: 999px; background: #d7d7d4; padding: 2px; transition: background .15s; }
@@ -222,6 +253,26 @@ html.dark .status-pill.progress { background: #1b2739; color: #a7c4e8; }
 html.dark .status-pill.done { background: #1c2b20; color: #a8d2ae; }
 html.dark .status-pill.cancelled { background: #351d1b; color: #f0aaa3; }
 html.dark .cart-count-badge { background: #f5f5f5; color: #111; }
+html.dark .order-timeline-step:not(:last-child)::before { background: #2a2a2a; }
+html.dark .order-timeline-marker { border-color: #333; background: #161616; color: #6f6f6f; }
+html.dark .order-timeline-step.done .order-timeline-marker { border-color: #f5f5f5; background: #f5f5f5; color: #111; }
+html.dark .order-timeline-step.current .order-timeline-marker { border-color: #f5f5f5; background: #161616; color: #f5f5f5; }
+html.dark .order-timeline-title { color: #9a9a9a; }
+html.dark .order-timeline-step.done .order-timeline-title { color: #cfcfcf; }
+html.dark .order-timeline-step.current .order-timeline-title { color: #fff; }
+html.dark .order-timeline-cancelled { background: #351d1b; color: #f0aaa3; }
+html.dark .wishlist-fab { border-color: #333; background: rgba(22,22,22,.9); color: #b5b5b5; }
+html.dark .wishlist-fab:hover { background: #1c1c1c; color: #fff; }
+html.dark .wishlist-fab.is-active { color: #fff; }
+html.dark .wishlist-detail-btn { border-color: #333; background: #161616; color: #ddd; }
+html.dark .wishlist-detail-btn:hover { background: #1e1e1e; }
+html.dark .wishlist-detail-btn.is-active { color: #fff; }
+html.dark .rating-star-filled { color: #c9a75a; }
+html.dark .rating-star-empty { color: #454545; }
+html.dark .rating-pick { color: #4a4a4a; }
+html.dark .rating-pick.is-active { color: #c9a75a; }
+html.dark .review-form { border-color: #2e2e2e; background: #161616; }
+html.dark .review-form-done { border-color: #24352a; background: #17231a; color: #a8d2ae; }
 html.dark .admin-toggle-track { background: #555; }
 html.dark .admin-toggle input:checked + .admin-toggle-track { background: #eee; }
 html.dark .admin-toggle input:checked + .admin-toggle-track span { background: #111; }
