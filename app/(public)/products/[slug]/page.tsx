@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ProductCard } from "@/components/catalog/ProductCard";
-import { ProductGallery } from "@/components/catalog/ProductGallery";
+import ProductCard from "@/components/catalog/ProductCard";
+import ProductGallery from "@/components/catalog/ProductGallery";
 import { ProductDescription } from "@/components/catalog/ProductDescription";
 import { AddToCartButton } from "@/components/catalog/AddToCartButton";
 import { WhatsAppButton } from "@/components/catalog/WhatsAppButton";

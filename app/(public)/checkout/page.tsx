@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CheckoutForm } from "@/components/cart/CheckoutForm";
+import CheckoutForm from "@/components/cart/CheckoutForm";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false, follow: false } };
 

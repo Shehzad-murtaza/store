@@ -122,18 +122,7 @@ async function FeaturedProductsSection() {
       <FeaturedSectionHeading />
       {products.length ? (
         <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard 
-              product={{
-                id: product.id,
-                title: product.name,
-                price: product.discount_price ?? product.price,
-                image_url: product.primary_image_url || "/placeholder.png",
-                slug: product.slug
-              }} 
-              key={product.id} 
-            />
-          ))}
+          {products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
       ) : (
         <EmptyState 

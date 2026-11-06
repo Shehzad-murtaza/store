@@ -55,18 +55,7 @@ export async function ProductResults({ filters, categoryId, categorySlug, clearH
     <section aria-label="Product results" className="w-full min-w-0">
       <p className="mb-4 text-[13px] text-[#666]">{products.length} {products.length === 1 ? "product" : "products"}</p>
       <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
-        {products.map((product) => (
-          <ProductCard 
-            key={product.id} 
-            product={{
-              id: product.id,
-              title: product.name, // Mapping DB 'name' to UI 'title'
-              price: product.discount_price ?? product.price,
-              image_url: product.primary_image_url || "/placeholder.png", // Mapping DB image to UI
-              slug: product.slug
-            }} 
-          />
-        ))}
+        {products.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
     </section>
   );

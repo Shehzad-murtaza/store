@@ -58,10 +58,11 @@ export function Footer() {
           <div className="lg:justify-self-end w-full">
             <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#444] mb-4">Stay in the loop</h3>
             <p className="text-[#666] text-sm mb-4">Subscribe to get special offers and updates.</p>
-            <form className="relative flex items-center" onSubmit={(e) => e.preventDefault()}>
+            <form className="relative flex items-center">
               <Mail className="absolute left-3 text-gray-400 h-4 w-4" />
               <input 
-                type="email" 
+                type="email"
+                name="email"
                 placeholder="Your email" 
                 className="w-full bg-[#fcfcfc] border border-[#eaeaea] text-sm rounded-lg py-2.5 pl-9 pr-10 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all"
                 required
