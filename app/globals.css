@@ -453,6 +453,15 @@ html.dark [class~="hover:bg-gray-50"]:hover,
 html.dark [class~="hover:bg-gray-100"]:hover,
 html.dark [class~="hover:bg-gray-200"]:hover { background-color: #292929 !important; }
 
+/* Keep catalog grids filled when a category has only a few products. */
+.catalog-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+@media (max-width: 639px) {
+  .catalog-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* Keep the homepage's editorial hero balanced in both themes. */
 .home-hero-main { color: #111; }
 .home-hero-badge { background: #111; color: #fff; }

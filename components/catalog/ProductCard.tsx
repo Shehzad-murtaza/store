@@ -21,13 +21,13 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
 
   return (
     <article className="group flex min-w-0 flex-col overflow-hidden rounded-xl border border-[#eaeaea] bg-white p-2.5 shadow-sm transition-shadow hover:shadow-md sm:p-3">
-      <Link href={`/products/${product.slug}`} className="relative block aspect-[4/5] overflow-hidden rounded-lg bg-[#f5f5f3]" aria-label={`View ${product.name}`}>
+      <Link href={`/products/${product.slug}`} className="relative block aspect-square overflow-hidden rounded-lg bg-[#f5f5f3]" aria-label={`View ${product.name}`}>
         {product.primary_image_url ? (
           <Image
             src={product.primary_image_url}
             alt={product.name}
             fill
-            className="object-contain p-2 transition-transform duration-300 group-hover:scale-[1.03]"
+            className="object-contain p-3 transition-transform duration-300 group-hover:scale-[1.03] sm:p-4"
             sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 22vw"
           />
         ) : (

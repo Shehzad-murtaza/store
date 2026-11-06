@@ -52,9 +52,9 @@ export default function HomePage() {
       </section>
 
       {/* 2. Trust Badges / Value Propositions */}
-      <section className="py-8 bg-white">
+      <section className="bg-[#fafafa] py-7">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-7 border-y border-gray-100 py-8 text-center sm:py-9 md:grid-cols-3 md:gap-6">
+          <div className="grid grid-cols-1 gap-7 border-y border-gray-100 py-7 text-center md:grid-cols-3 md:gap-6">
             <div className="flex flex-col items-center">
               <Truck className="mb-3 h-6 w-6 text-black" strokeWidth={1.6} />
               <h3 className="mb-1.5 text-sm font-semibold text-gray-900">Fast Delivery</h3>
@@ -138,39 +138,43 @@ async function FeaturedProductsSection() {
   const products = featured.length ? featured : await getProducts({ sort: "newest", limit: 4 });
   
   return (
-    <section id="featured" className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 bg-white">
-      <FeaturedSectionHeading />
-      {products.length ? (
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-          {products.map((product) => <ProductCard key={product.id} product={product} />)}
+      <section id="featured" className="bg-[#fafafa]">
+        <div className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6 lg:px-8">
+          <FeaturedSectionHeading />
+          {products.length ? (
+            <div className={`catalog-product-grid mx-auto w-full gap-4 sm:gap-6 ${products.length === 1 ? "max-w-md" : products.length < 4 ? "max-w-3xl" : ""}`}>
+              {products.map((product) => <ProductCard key={product.id} product={product} />)}
+            </div>
+          ) : (
+            <EmptyState
+              className="home-featured-empty"
+              title="A few good things are on their way"
+              description="Featured pieces will appear here as soon as they are added to the collection."
+              actionHref="/products"
+              actionLabel="Browse all products"
+            />
+          )}
         </div>
-      ) : (
-        <EmptyState 
-          className="home-featured-empty" 
-          title="A few good things are on their way" 
-          description="Featured pieces will appear here as soon as they are added to the collection." 
-          actionHref="/products" 
-          actionLabel="Browse all products" 
-        />
-      )}
-    </section>
+      </section>
   );
 }
 
 function FeaturedProductsFallback() {
   return (
-    <section id="featured" className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8 bg-white">
-      <FeaturedSectionHeading />
-      <div aria-label="Loading featured products" className="grid grid-cols-2 gap-4 animate-pulse sm:gap-6 lg:grid-cols-4">
-        {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
-            <div className="aspect-[4/5] rounded-xl bg-gray-100" />
-            <div className="mt-4 space-y-2 px-1">
-              <div className="h-4 w-2/3 rounded bg-gray-200" />
-              <div className="h-5 w-1/3 rounded bg-gray-200" />
+    <section id="featured" className="bg-[#fafafa]">
+      <div className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6 lg:px-8">
+        <FeaturedSectionHeading />
+        <div aria-label="Loading featured products" className="catalog-product-grid animate-pulse gap-4 sm:gap-6">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+              <div className="aspect-square rounded-xl bg-gray-100" />
+              <div className="mt-4 space-y-2 px-1">
+                <div className="h-4 w-2/3 rounded bg-gray-200" />
+                <div className="h-5 w-1/3 rounded bg-gray-200" />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
