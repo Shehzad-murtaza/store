@@ -29,18 +29,18 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 min-h-[500px]">
           
           {/* Main Large Card */}
-          <div className="lg:col-span-2 relative rounded-[32px] bg-[#F6F6F4] overflow-hidden flex flex-col justify-center p-8 sm:p-12 md:p-16 shadow-sm border border-gray-100">
-            <span className="inline-block py-1.5 px-4 rounded-full bg-black text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-6 self-start">
+          <div className="home-hero-main lg:col-span-2 relative rounded-[32px] bg-[#F6F6F4] overflow-hidden flex flex-col justify-center p-8 sm:p-12 md:p-16 shadow-sm border border-gray-100">
+            <span className="home-hero-badge inline-block py-1.5 px-4 rounded-full bg-black text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-6 self-start">
               SHEZY Exclusive
             </span>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 tracking-tighter mb-6 leading-[1.05]">
+            <h1 className="home-hero-title text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 tracking-tighter mb-6 leading-[1.05]">
               Good things,<br />chosen well.
             </h1>
-            <p className="text-gray-600 mb-10 max-w-md text-base sm:text-lg font-medium">
+            <p className="home-hero-description text-gray-600 mb-10 max-w-md text-base sm:text-lg font-medium">
               A considered edit of pieces for everyday living. Elevate your lifestyle with our premium collection.
             </p>
             <div className="flex flex-wrap gap-4 mt-auto">
-              <Link href="/products" className="bg-black text-white px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1">
+              <Link href="/products" className="home-hero-cta bg-black text-white px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1">
                 Explore Now <ArrowRight size={16} />
               </Link>
             </div>

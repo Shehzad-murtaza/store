@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   color-scheme: light;
@@ -431,6 +432,41 @@ html.dark .admin-sidebar-bottom,
 html.dark .admin-sheet-bottom { border-color: var(--border); }
 html.dark .admin-categories-actions button.text-red-700:hover { background: #351d1b; color: #f0aaa3; }
 
+/* Tailwind's neutral utilities follow the class theme set by next-themes. */
+html.dark [class~="bg-gray-50"] { background-color: #161616 !important; }
+html.dark [class~="bg-gray-100"] { background-color: #1c1c1c !important; }
+html.dark [class~="bg-gray-200"] { background-color: #292929 !important; }
+html.dark [class~="bg-gray-300"] { background-color: #333 !important; }
+html.dark [class~="text-gray-900"],
+html.dark [class~="text-gray-800"],
+html.dark [class~="text-gray-700"] { color: #f5f5f5 !important; }
+html.dark [class~="text-gray-600"],
+html.dark [class~="text-gray-500"] { color: #a3a3a3 !important; }
+html.dark [class~="text-gray-400"],
+html.dark [class~="text-gray-300"] { color: #888 !important; }
+html.dark [class~="border-gray-100"],
+html.dark [class~="border-gray-200"],
+html.dark [class~="border-gray-300"] { border-color: #2a2a2a !important; }
+html.dark [class~="divide-gray-100"] > :not(:last-child),
+html.dark [class~="divide-gray-200"] > :not(:last-child) { border-color: #2a2a2a !important; }
+html.dark [class~="hover:bg-gray-50"]:hover,
+html.dark [class~="hover:bg-gray-100"]:hover,
+html.dark [class~="hover:bg-gray-200"]:hover { background-color: #292929 !important; }
+
+/* Keep the homepage's editorial hero balanced in both themes. */
+.home-hero-main { color: #111; }
+.home-hero-badge { background: #111; color: #fff; }
+.home-hero-title { color: #111; }
+.home-hero-description { color: #666; }
+.home-hero-cta { background: #111; color: #fff; }
+html.dark .home-hero-main { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
+html.dark .home-hero-badge { background: #f5f5f5; color: #111; }
+html.dark .home-hero-title { color: #f5f5f5; }
+html.dark .home-hero-description { color: #a3a3a3; }
+html.dark .home-hero-cta { background: #f5f5f5; color: #111; }
+html.dark .home-hero-cta:hover { background: #dedede; }
+html.dark #categories { background: #111; }
+
 /* Storefront shell: one quiet, responsive system around the editorial content. */
 .glass-site-header {
   background: rgb(250 250 250 / 0.78);
@@ -465,7 +501,8 @@ html.dark .public-header-menu:hover { background: rgb(255 255 255 / 0.08); }
 html.dark .public-header-dashboard { color: #eee; }
 html.dark .public-header-dashboard:hover { background: rgb(255 255 255 / 0.08); }
 html.dark .public-nav-link[aria-current="page"] { color: #fff; }
-html.dark [class~="bg-[#111]"] { background-color: #f5f5f5 !important; color: #111 !important; }
+html.dark a[class~="bg-[#111]"],
+html.dark button[class~="bg-[#111]"] { background-color: #f5f5f5 !important; color: #111 !important; }
 html.dark [class~="hover:bg-[#333]"]:hover { background-color: #dedede !important; color: #111 !important; }
 html.dark [class~="bg-[#f7f7f6]"],
 html.dark [class~="bg-[#f5f5f3]"],
