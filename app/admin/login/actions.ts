@@ -28,5 +28,12 @@ export async function loginAction(_previousState: LoginState, formData: FormData
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: "Email or password is incorrect." };
 
+  // Being able to sign in is not enough — only allowlisted accounts may manage the store.
+  const { data: isAdmin } = await supabase.rpc("is_admin");
+  if (!isAdmin) {
+    await supabase.auth.signOut();
+    return { error: "This account does not have administrator access." };
+  }
+
   redirect(destination);
 }
