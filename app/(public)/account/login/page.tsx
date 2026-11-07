@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 type PageProps = { searchParams: Promise<{ next?: string }> };
 
 function safeNext(value: string | undefined): string {
-  if (!value || !value.startsWith("/account") || value.startsWith("//")) return "/account";
+  if (!value || !value.startsWith("/account") || value.startsWith("//")) return "/account/profile";
   return value;
 }
 

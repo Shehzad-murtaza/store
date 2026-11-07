@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { loadCustomerSavedLists, syncCustomerWishlist } from "@/app/(public)/account/saved-data-actions";
 
 export interface WishlistItem {
   id: string;
@@ -23,13 +24,14 @@ interface WishlistContextValue {
   clear: () => void;
 }
 
-const STORAGE_KEY = "shezy-wishlist-v1";
+const STORAGE_KEY = "shezy-wishlist-session-v2";
+const LEGACY_STORAGE_KEY = "shezy-wishlist-v1";
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
 function readStoredItems(): WishlistItem[] {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -42,20 +44,83 @@ function readStoredItems(): WishlistItem[] {
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [ready, setReady] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const persistQueue = useRef(Promise.resolve());
+  const currentUserId = useRef<string | null>(null);
+  const readyRef = useRef(false);
 
   useEffect(() => {
-    setItems(readStoredItems());
-    setReady(true);
+    let active = true;
+    let generation = 0;
+    let unsubscribe = () => {};
+
+    async function hydrate(nextUserId: string | null) {
+      if (!active) return;
+      if (currentUserId.current === nextUserId && readyRef.current) return;
+      const request = ++generation;
+      currentUserId.current = nextUserId;
+      readyRef.current = false;
+      setReady(false);
+      setUserId(nextUserId);
+      try { window.localStorage.removeItem(LEGACY_STORAGE_KEY); } catch { /* Storage can be unavailable. */ }
+
+      if (!nextUserId) {
+        setItems(readStoredItems());
+        readyRef.current = true;
+        setReady(true);
+        return;
+      }
+
+      try {
+        const saved = await loadCustomerSavedLists();
+        if (!active || request !== generation) return;
+        if (saved?.userId === nextUserId) {
+          const merged = new Map(saved.wishlist.map((item) => [item.id, item]));
+          for (const guest of readStoredItems()) merged.set(guest.id, guest);
+          setItems([...merged.values()]);
+          try { window.sessionStorage.removeItem(STORAGE_KEY); } catch { /* Storage can be unavailable. */ }
+        } else {
+          setItems(readStoredItems());
+        }
+      } catch (error) {
+        console.error("Could not load saved customer wishlist:", error);
+        if (!active || request !== generation) return;
+        setItems(readStoredItems());
+      }
+
+      if (!active || request !== generation) return;
+      readyRef.current = true;
+      setReady(true);
+    }
+
+    void import("@/lib/supabase/client").then(({ createClient }) => {
+      if (!active) return;
+      const supabase = createClient();
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        void hydrate(session?.user.id ?? null);
+      });
+      unsubscribe = () => subscription.unsubscribe();
+      void supabase.auth.getUser().then(({ data }) => hydrate(data.user?.id ?? null));
+    });
+
+    return () => {
+      active = false;
+      generation++;
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
     if (!ready) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
-      // Storage may be unavailable (private mode); the wishlist still works in memory.
+    if (userId) {
+      const snapshot = items.map(({ id }) => id);
+      const timer = window.setTimeout(() => {
+        persistQueue.current = persistQueue.current.then(() => syncCustomerWishlist(userId, snapshot));
+      }, 250);
+      return () => window.clearTimeout(timer);
     }
-  }, [items, ready]);
+    try { window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch { /* Memory-only fallback. */ }
+  }, [items, ready, userId]);
 
   const toggle = useCallback((item: WishlistItem) => {
     setItems((current) => current.some((entry) => entry.id === item.id)

@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { loadCustomerSavedLists, syncCustomerCart } from "@/app/(public)/account/saved-data-actions";
 
 export interface CartLine {
   productId: string;
@@ -24,13 +25,14 @@ interface CartContextValue {
   clear: () => void;
 }
 
-const STORAGE_KEY = "shezy-cart-v1";
+const STORAGE_KEY = "shezy-cart-session-v2";
+const LEGACY_STORAGE_KEY = "shezy-cart-v1";
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 function readStoredLines(): CartLine[] {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -44,20 +46,90 @@ function readStoredLines(): CartLine[] {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [ready, setReady] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const persistQueue = useRef(Promise.resolve());
+  const currentUserId = useRef<string | null>(null);
+  const readyRef = useRef(false);
 
   useEffect(() => {
-    setLines(readStoredLines());
-    setReady(true);
+    let active = true;
+    let generation = 0;
+    let unsubscribe = () => {};
+
+    async function hydrate(nextUserId: string | null) {
+      if (!active) return;
+      if (currentUserId.current === nextUserId && readyRef.current) return;
+      const request = ++generation;
+      currentUserId.current = nextUserId;
+      readyRef.current = false;
+      setReady(false);
+      setUserId(nextUserId);
+
+      try { window.localStorage.removeItem(LEGACY_STORAGE_KEY); } catch { /* Storage can be unavailable. */ }
+
+      if (!nextUserId) {
+        setLines(readStoredLines());
+        readyRef.current = true;
+        setReady(true);
+        return;
+      }
+
+      try {
+        const saved = await loadCustomerSavedLists();
+        if (!active || request !== generation) return;
+        if (saved?.userId === nextUserId) {
+          const guestLines = readStoredLines();
+          const merged = new Map(saved.cart.map((line) => [line.productId, line]));
+          for (const guest of guestLines) {
+            const existing = merged.get(guest.productId);
+            merged.set(guest.productId, existing
+              ? { ...existing, quantity: Math.min(existing.quantity + guest.quantity, existing.maxStock) }
+              : guest);
+          }
+          setLines([...merged.values()]);
+          try { window.sessionStorage.removeItem(STORAGE_KEY); } catch { /* Storage can be unavailable. */ }
+        } else {
+          setLines(readStoredLines());
+        }
+      } catch (error) {
+        console.error("Could not load saved customer cart:", error);
+        if (!active || request !== generation) return;
+        setLines(readStoredLines());
+      }
+
+      if (!active || request !== generation) return;
+      readyRef.current = true;
+      setReady(true);
+    }
+
+    void import("@/lib/supabase/client").then(({ createClient }) => {
+      if (!active) return;
+      const supabase = createClient();
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        void hydrate(session?.user.id ?? null);
+      });
+      unsubscribe = () => subscription.unsubscribe();
+      void supabase.auth.getUser().then(({ data }) => hydrate(data.user?.id ?? null));
+    });
+
+    return () => {
+      active = false;
+      generation++;
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
     if (!ready) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
-    } catch {
-      // Storage may be unavailable (private mode); the cart still works in memory.
+    if (userId) {
+      const snapshot = lines.map(({ productId, quantity }) => ({ productId, quantity }));
+      const timer = window.setTimeout(() => {
+        persistQueue.current = persistQueue.current.then(() => syncCustomerCart(userId, snapshot));
+      }, 250);
+      return () => window.clearTimeout(timer);
     }
-  }, [lines, ready]);
+    try { window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(lines)); } catch { /* Memory-only fallback. */ }
+  }, [lines, ready, userId]);
 
   const addLine = useCallback((line: Omit<CartLine, "quantity">, quantity = 1) => {
     if (line.maxStock <= 0) return;

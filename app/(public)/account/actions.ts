@@ -12,7 +12,7 @@ const MIN_PASSWORD_LENGTH = 8;
 
 /** Only allow same-site account destinations after authentication. */
 function safeNext(value: FormDataEntryValue | null): string {
-  if (typeof value !== "string" || !value.startsWith("/account") || value.startsWith("//")) return "/account";
+  if (typeof value !== "string" || !value.startsWith("/account") || value.startsWith("//")) return "/account/profile";
   return value;
 }
 

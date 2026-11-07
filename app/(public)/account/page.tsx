@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, LogOut, ReceiptText } from "lucide-react";
+import { ArrowRight, LogOut, ReceiptText, UserRound } from "lucide-react";
 import { EmptyState } from "@/components/catalog/EmptyState";
 import { signOutAction } from "@/app/(public)/account/actions";
-import { getCustomerOrders, requireCustomer } from "@/lib/supabase/customer";
+import { getCustomerOrders, requireCustomer, type CustomerOrderRow } from "@/lib/supabase/customer";
 import { formatDateTime, formatPKR } from "@/lib/catalog/format";
 import { orderStatusLabel, orderStatusTone } from "@/lib/catalog/orders";
 
@@ -12,7 +12,15 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
   const user = await requireCustomer();
-  const orders = await getCustomerOrders(user.id);
+  let orders: CustomerOrderRow[];
+  let ordersUnavailable = false;
+  try {
+    orders = await getCustomerOrders(user.id);
+  } catch (error) {
+    console.error("Could not load customer order history:", error);
+    orders = [];
+    ordersUnavailable = true;
+  }
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-[840px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
     <header className="flex flex-wrap items-start justify-between gap-4">
@@ -21,13 +29,22 @@ export default async function AccountPage() {
         <h1 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">My orders</h1>
         <p className="mt-1 text-sm text-[#666]">{user.email}</p>
       </div>
-      <form action={signOutAction}>
-        <button type="submit" className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-4 text-sm text-[#444] transition-colors hover:bg-[#fafafa]"><LogOut size={15} />Sign out</button>
-      </form>
+      <div className="flex items-center gap-2">
+        <Link href="/account/profile" className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-3 text-sm text-[#444] transition-colors hover:bg-[#fafafa]"><UserRound size={15} /><span className="hidden sm:inline">Profile</span></Link>
+        <form action={signOutAction}>
+          <button type="submit" className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-3 sm:px-4 text-sm text-[#444] transition-colors hover:bg-[#fafafa]"><LogOut size={15} /><span className="hidden sm:inline">Sign out</span></button>
+        </form>
+      </div>
     </header>
 
     <section className="mt-8">
-      {orders.length
+      {ordersUnavailable
+        ? <div role="alert" className="rounded-xl border border-[#eaeaea] bg-white px-5 py-8 text-center shadow-sm">
+          <h2 className="text-base font-semibold">Your orders could not be loaded</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#666]">Your account is available, but we could not retrieve your order history right now. Please try again in a moment.</p>
+          <Link href="/account" className="mt-4 inline-flex h-9 items-center rounded-lg border border-[#eaeaea] px-4 text-sm font-medium text-[#333] transition-colors hover:bg-[#f7f7f7]">Try again</Link>
+        </div>
+        : orders.length
         ? <ul className="grid gap-3">{orders.map((order) => <li key={order.id}>
           <Link href={`/account/orders/${encodeURIComponent(order.order_number)}`} className="flex flex-wrap items-center gap-3 rounded-xl border border-[#eaeaea] bg-white p-4 shadow-sm transition hover:shadow-md sm:gap-4 sm:p-5">
             <div className="grid size-11 shrink-0 place-items-center rounded-lg border border-[#eaeaea] bg-[#f3f3f2] text-[#888]"><ReceiptText size={18} /></div>

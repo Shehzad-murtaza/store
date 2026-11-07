@@ -97,7 +97,7 @@ export function Header() {
             })}
           </nav>
           <div className="grid grid-cols-2 gap-2 border-t border-[#eaeaea] pt-3 sm:hidden">
-            <Link href="/account" onClick={() => setIsMenuOpen(false)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#eaeaea] text-xs font-medium text-[#444]"><UserRound size={15} />My account</Link>
+            <Link href="/account/profile" onClick={() => setIsMenuOpen(false)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#eaeaea] text-xs font-medium text-[#444]"><UserRound size={15} />My profile</Link>
             <Link href="/wishlist" onClick={() => setIsMenuOpen(false)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#eaeaea] text-xs font-medium text-[#444]"><Heart size={15} />Wishlist</Link>
             <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="col-span-2 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#111] text-xs font-medium text-white"><Store size={15} />Help & support</Link>
           </div>
