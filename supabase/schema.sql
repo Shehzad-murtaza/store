@@ -63,12 +63,25 @@ create table if not exists public.products (
   description text,
   price numeric(12, 2) not null,
   discount_price numeric(12, 2),
+  delivery_fee numeric(12, 2) not null default 0 constraint products_delivery_fee_nonnegative check (delivery_fee >= 0),
   category_id uuid references public.categories(id) on delete set null,
   is_sold boolean not null default false,
   is_featured boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.products add column if not exists delivery_fee numeric(12, 2) not null default 0 constraint products_delivery_fee_nonnegative check (delivery_fee >= 0);
+
+create table if not exists public.store_settings (
+  id boolean primary key default true check (id),
+  default_delivery_fee numeric(12, 2) not null default 0 check (default_delivery_fee >= 0),
+  updated_at timestamptz not null default now()
+);
+
+insert into public.store_settings (id, default_delivery_fee)
+values (true, 0)
+on conflict (id) do nothing;
 
 create table if not exists public.product_images (
   id uuid primary key default gen_random_uuid(),
@@ -90,6 +103,9 @@ create trigger categories_set_updated_at before update on public.categories
   for each row execute function public.set_updated_at();
 drop trigger if exists products_set_updated_at on public.products;
 create trigger products_set_updated_at before update on public.products
+  for each row execute function public.set_updated_at();
+drop trigger if exists store_settings_set_updated_at on public.store_settings;
+create trigger store_settings_set_updated_at before update on public.store_settings
   for each row execute function public.set_updated_at();
 
 alter table public.categories enable row level security;
@@ -146,6 +162,16 @@ drop policy if exists "Authenticated users can delete product images" on public.
 drop policy if exists "Admins can delete product images" on public.product_images;
 create policy "Admins can delete product images" on public.product_images
   for delete to authenticated using (public.is_admin());
+
+alter table public.store_settings enable row level security;
+grant select on public.store_settings to anon, authenticated;
+grant insert, update on public.store_settings to authenticated;
+drop policy if exists "Public can read delivery settings" on public.store_settings;
+create policy "Public can read delivery settings" on public.store_settings
+  for select to anon, authenticated using (true);
+drop policy if exists "Admins manage delivery settings" on public.store_settings;
+create policy "Admins manage delivery settings" on public.store_settings
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- Customer saved cart and wishlist. Guest state stays in the browser session;
 -- these tables are only available to the signed-in owner.
@@ -418,7 +444,17 @@ begin
     raise exception 'Your cart is empty';
   end if;
 
-  v_shipping := greatest(coalesce(p_shipping_fee, 0), 0);
+  -- p_shipping_fee remains in the signature for compatibility but is not trusted.
+  select coalesce(s.default_delivery_fee, 0)
+    into v_shipping
+    from public.store_settings s
+    where s.id = true;
+  v_shipping := coalesce(v_shipping, 0);
+
+  select v_shipping + coalesce(sum(greatest(p.delivery_fee, 0) * greatest(x.quantity, 0)), 0)
+    into v_shipping
+    from jsonb_to_recordset(p_items) as x(product_id uuid, quantity integer)
+    join public.products p on p.id = x.product_id;
 
   insert into public.orders (
     customer_name, customer_phone, customer_email, address, city, notes, payment_method, shipping_fee, user_id
@@ -431,7 +467,7 @@ begin
     nullif(trim(coalesce(p_notes, '')), ''),
     p_payment_method,
     v_shipping,
-    auth.uid()
+    case when public.is_admin() then null else auth.uid() end
   )
   returning id, order_number into v_order_id, v_order_number;
 

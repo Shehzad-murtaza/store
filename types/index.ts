@@ -15,6 +15,7 @@ export interface Product {
   description: string | null;
   price: number;
   discount_price: number | null;
+  delivery_fee: number;
   category_id: string | null;
   is_sold: boolean;
   is_featured: boolean;

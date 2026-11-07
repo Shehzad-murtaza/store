@@ -9,6 +9,7 @@ export interface CartLine {
   name: string;
   /** Display-only price; the server always recomputes the real amount. */
   unitPrice: number;
+  deliveryFee: number;
   imageUrl: string | null;
   quantity: number;
   maxStock: number;
@@ -37,7 +38,8 @@ function readStoredLines(): CartLine[] {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     return parsed.filter((line): line is CartLine =>
-      line && typeof line.productId === "string" && typeof line.quantity === "number" && line.quantity > 0);
+      line && typeof line.productId === "string" && typeof line.quantity === "number" && line.quantity > 0)
+      .map((line) => ({ ...line, deliveryFee: Number(line.deliveryFee) || 0 }));
   } catch {
     return [];
   }

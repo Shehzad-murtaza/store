@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BarChart3, LayoutDashboard, Layers3, LogOut, Menu, Package, ReceiptText, Star, Store, X } from "lucide-react";
+import { BarChart3, LayoutDashboard, Layers3, LogOut, Menu, Package, ReceiptText, Settings2, Star, Store, X } from "lucide-react";
 import { logoutAction } from "@/app/admin/actions";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 
@@ -14,6 +14,7 @@ const navigation = [
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Categories", href: "/admin/categories", icon: Layers3 },
   { label: "Reviews", href: "/admin/reviews", icon: Star },
+  { label: "Delivery settings", href: "/admin/settings", icon: Settings2 },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {

@@ -14,6 +14,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
     name: product.name,
     price: product.price,
     discountPrice: product.discount_price,
+    deliveryFee: Number(product.delivery_fee ?? 0),
     imageUrl: product.primary_image_url,
     stock: product.stock_quantity,
     sold: product.is_sold,

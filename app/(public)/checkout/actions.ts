@@ -2,7 +2,6 @@
 
 import { revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { SHIPPING_FEE } from "@/lib/catalog/orders";
 
 export interface PlaceOrderInput {
   customerName: string;
@@ -19,6 +18,20 @@ export interface PlaceOrderResult {
   ok: boolean;
   orderNumber?: string;
   error?: string;
+}
+
+export async function getDeliveryQuote(productIds: string[]): Promise<{ defaultDeliveryFee: number; productFees: Record<string, number> }> {
+  const supabase = await createClient();
+  const ids = [...new Set(productIds.filter(Boolean))].slice(0, 100);
+  const [{ data: settings }, { data: products }] = await Promise.all([
+    supabase.from("store_settings").select("default_delivery_fee").eq("id", true).maybeSingle(),
+    ids.length ? supabase.from("products").select("id, delivery_fee").in("id", ids) : Promise.resolve({ data: [] as Array<{ id: string; delivery_fee: number }> }),
+  ]);
+
+  return {
+    defaultDeliveryFee: Number(settings?.default_delivery_fee ?? 0),
+    productFees: Object.fromEntries((products ?? []).map((product) => [product.id, Number(product.delivery_fee ?? 0)])),
+  };
 }
 
 function clean(value: string): string {
@@ -55,7 +68,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
     p_city: city,
     p_notes: notes || null,
     p_payment_method: input.paymentMethod,
-    p_shipping_fee: SHIPPING_FEE,
+    p_shipping_fee: 0,
     p_items: items,
   });
 

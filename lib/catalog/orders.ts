@@ -1,8 +1,5 @@
 import type { OrderStatus, PaymentMethod, PaymentStatus, Product } from "@/types";
 
-/** Flat delivery charge applied to every order. Set to 0 for free delivery. */
-export const SHIPPING_FEE = 0;
-
 export const ORDER_STATUSES: Array<{ value: OrderStatus; label: string; tone: "pending" | "progress" | "done" | "cancelled" }> = [
   { value: "pending", label: "Pending", tone: "pending" },
   { value: "confirmed", label: "Confirmed", tone: "progress" },

@@ -10,6 +10,7 @@ type SavedProduct = {
   name: string;
   price: number | string;
   discount_price: number | string | null;
+  delivery_fee: number | string;
   stock_quantity: number;
   is_sold: boolean;
   product_images: Array<{ image_url: string; is_primary: boolean; sort_order: number }> | null;
@@ -43,10 +44,10 @@ export async function loadCustomerSavedLists(): Promise<{ userId: string; cart: 
 
   const [cartResult, wishlistResult] = await Promise.all([
     supabase.from("customer_cart_items")
-      .select("product_id, quantity, products!inner(id, slug, name, price, discount_price, stock_quantity, is_sold, product_images(image_url, is_primary, sort_order))")
+      .select("product_id, quantity, products!inner(id, slug, name, price, discount_price, delivery_fee, stock_quantity, is_sold, product_images(image_url, is_primary, sort_order))")
       .eq("user_id", userId),
     supabase.from("customer_wishlist_items")
-      .select("product_id, products!inner(id, slug, name, price, discount_price, stock_quantity, is_sold, product_images(image_url, is_primary, sort_order))")
+      .select("product_id, products!inner(id, slug, name, price, discount_price, delivery_fee, stock_quantity, is_sold, product_images(image_url, is_primary, sort_order))")
       .eq("user_id", userId),
   ]);
 
@@ -62,6 +63,7 @@ export async function loadCustomerSavedLists(): Promise<{ userId: string; cart: 
       slug: product.slug,
       name: product.name,
       unitPrice: Number(product.discount_price ?? product.price),
+      deliveryFee: Number(product.delivery_fee ?? 0),
       imageUrl: primaryImage(product),
       quantity: Math.min(quantity, product.stock_quantity),
       maxStock: product.stock_quantity,
@@ -77,6 +79,7 @@ export async function loadCustomerSavedLists(): Promise<{ userId: string; cart: 
       name: product.name,
       price: Number(product.price),
       discountPrice: product.discount_price === null ? null : Number(product.discount_price),
+      deliveryFee: Number(product.delivery_fee ?? 0),
       imageUrl: primaryImage(product),
       stock: product.stock_quantity,
       sold: product.is_sold,

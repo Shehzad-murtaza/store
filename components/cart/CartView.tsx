@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
+import { useDeliveryQuote } from "@/components/cart/useDeliveryQuote";
 import { formatPKR } from "@/lib/catalog/format";
-import { SHIPPING_FEE } from "@/lib/catalog/orders";
 
-export default function CartView() {
+export default function CartView({ defaultDeliveryFee }: { defaultDeliveryFee: number }) {
   const { lines, subtotal, ready, setQuantity, removeLine } = useCart();
+  const deliveryQuote = useDeliveryQuote(lines, defaultDeliveryFee);
 
   if (!ready) return <div aria-label="Loading cart" className="grid gap-6 animate-pulse lg:grid-cols-[minmax(0,1fr)_340px]">
     <div className="h-64 rounded-xl border border-[#eaeaea] bg-white" />
@@ -24,7 +25,8 @@ export default function CartView() {
     </div>
   </section>;
 
-  const shipping = SHIPPING_FEE;
+  const productDelivery = lines.reduce((total, line) => total + deliveryQuote.feeFor(line) * line.quantity, 0);
+  const shipping = deliveryQuote.defaultDeliveryFee + productDelivery;
   const total = subtotal + shipping;
 
   return <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
@@ -36,6 +38,7 @@ export default function CartView() {
         <div className="flex min-w-0 flex-col justify-center">
           <Link href={`/products/${line.slug}`} className="line-clamp-2 text-sm font-medium leading-5 text-[#222] hover:text-[#666]">{line.name}</Link>
           <p className="mt-1 text-xs text-[#777]">{formatPKR(line.unitPrice)} each</p>
+          {deliveryQuote.feeFor(line) > 0 && <p className="mt-1 text-[11px] text-[#777]">Extra delivery: {formatPKR(deliveryQuote.feeFor(line))} per item</p>}
         </div>
         <div className="col-span-2 flex items-center justify-between gap-2 sm:col-span-1 sm:justify-end sm:gap-4">
           <QuantityControl name={line.name} quantity={line.quantity} max={line.maxStock} onChange={(next) => setQuantity(line.productId, next)} />
@@ -51,7 +54,8 @@ export default function CartView() {
       <h2 className="text-base font-semibold tracking-[-0.02em]">Order summary</h2>
       <dl className="mt-5 space-y-3 border-b border-[#eaeaea] pb-5 text-sm">
         <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Subtotal</dt><dd className="font-medium">{formatPKR(subtotal)}</dd></div>
-        <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Delivery</dt><dd className="font-medium">{shipping ? formatPKR(shipping) : "Free"}</dd></div>
+        <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Base delivery</dt><dd className="font-medium">{deliveryQuote.defaultDeliveryFee ? formatPKR(deliveryQuote.defaultDeliveryFee) : "Free"}</dd></div>
+        {productDelivery > 0 && <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Product delivery extras</dt><dd className="font-medium">{formatPKR(productDelivery)}</dd></div>}
       </dl>
       <div className="flex items-center justify-between gap-3 py-4"><span className="text-sm font-semibold">Total</span><span className="text-lg font-semibold tracking-[-0.02em]">{formatPKR(total)}</span></div>
       <Link href="/checkout" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#111] px-4 text-sm font-medium text-white transition-colors hover:bg-[#333]">Continue to checkout<ArrowRight size={15} /></Link>

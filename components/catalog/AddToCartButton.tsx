@@ -11,6 +11,7 @@ export interface AddToCartProduct {
   name: string;
   price: number;
   discountPrice: number | null;
+  deliveryFee: number;
   imageUrl: string | null;
   stock: number;
   sold: boolean;
@@ -37,6 +38,7 @@ export function AddToCartButton({ product, className, label = "Add to cart", com
       slug: product.slug,
       name: product.name,
       unitPrice: product.discountPrice ?? product.price,
+      deliveryFee: product.deliveryFee,
       imageUrl: product.imageUrl,
       maxStock: product.stock,
     });

@@ -9,6 +9,7 @@ export interface WishlistItem {
   name: string;
   price: number;
   discountPrice: number | null;
+  deliveryFee: number;
   imageUrl: string | null;
   stock: number;
   sold: boolean;

@@ -6,19 +6,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Banknote, CheckCircle2, CreditCard, LoaderCircle, ShieldCheck, ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
+import { useDeliveryQuote } from "@/components/cart/useDeliveryQuote";
 import { placeOrder } from "@/app/(public)/checkout/actions";
 import { formatPKR } from "@/lib/catalog/format";
-import { SHIPPING_FEE } from "@/lib/catalog/orders";
 import type { PaymentMethod } from "@/types";
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ defaultDeliveryFee }: { defaultDeliveryFee: number }) {
   const { lines, subtotal, ready, clear } = useCart();
+  const deliveryQuote = useDeliveryQuote(lines, defaultDeliveryFee);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const router = useRouter();
-  const total = subtotal + (lines.length ? SHIPPING_FEE : 0);
+  const productDelivery = lines.reduce((sum, line) => sum + deliveryQuote.feeFor(line) * line.quantity, 0);
+  const deliveryTotal = deliveryQuote.defaultDeliveryFee + productDelivery;
+  const total = subtotal + (lines.length ? deliveryTotal : 0);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -115,13 +118,14 @@ export default function CheckoutForm() {
             {line.imageUrl ? <Image src={line.imageUrl} alt={line.name} fill sizes="56px" className="object-contain p-1" /> : <span className="absolute inset-0 grid place-items-center text-[9px] text-[#888]">No image</span>}
             <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-[#111] text-[10px] font-medium text-white">{line.quantity}</span>
           </div>
-          <div className="min-w-0 flex-1"><p className="line-clamp-2 text-xs font-medium leading-5">{line.name}</p><p className="mt-0.5 text-xs text-[#777]">{line.quantity} × {formatPKR(line.unitPrice)}</p></div>
+          <div className="min-w-0 flex-1"><p className="line-clamp-2 text-xs font-medium leading-5">{line.name}</p><p className="mt-0.5 text-xs text-[#777]">{line.quantity} × {formatPKR(line.unitPrice)}</p>{deliveryQuote.feeFor(line) > 0 && <p className="mt-0.5 text-[10px] text-[#777]">Extra delivery: {formatPKR(deliveryQuote.feeFor(line))} each</p>}</div>
           <span className="shrink-0 text-xs font-semibold">{formatPKR(line.unitPrice * line.quantity)}</span>
         </li>)}
       </ul>
       <dl className="mt-4 space-y-3 text-sm">
         <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Subtotal</dt><dd className="font-medium">{formatPKR(subtotal)}</dd></div>
-        <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Delivery</dt><dd className="font-medium">{SHIPPING_FEE ? formatPKR(SHIPPING_FEE) : "Free"}</dd></div>
+        <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Base delivery</dt><dd className="font-medium">{deliveryQuote.defaultDeliveryFee ? formatPKR(deliveryQuote.defaultDeliveryFee) : "Free"}</dd></div>
+        {productDelivery > 0 && <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Product delivery extras</dt><dd className="font-medium">{formatPKR(productDelivery)}</dd></div>}
         <div className="flex items-center justify-between gap-3 border-t border-[#eaeaea] pt-3"><dt className="font-semibold">Total</dt><dd className="text-base font-semibold">{formatPKR(total)}</dd></div>
       </dl>
       <button type="submit" form="checkout-form" disabled={submitting} className="mt-5 hidden h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#111] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-wait disabled:opacity-60 sm:inline-flex">

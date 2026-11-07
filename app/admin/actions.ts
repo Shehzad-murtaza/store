@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/catalog/slug";
@@ -49,6 +49,24 @@ export async function logoutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+export async function saveDefaultDeliveryFee(formData: FormData): Promise<AdminActionResult> {
+  await requireAdmin();
+  const value = field(formData, "default_delivery_fee");
+  const fee = Number(value);
+  if (!value || !Number.isFinite(fee) || fee < 0 || fee > 1000000) {
+    return { ok: false, error: "Enter a delivery fee between PKR 0 and PKR 1,000,000." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("store_settings").upsert({ id: true, default_delivery_fee: Math.round(fee * 100) / 100 }, { onConflict: "id" });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/settings");
+  revalidatePath("/cart");
+  revalidatePath("/checkout");
+  return { ok: true };
 }
 
 export async function saveCategory(formData: FormData): Promise<AdminActionResult> {
@@ -130,6 +148,8 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
   const discountPrice = discountValue === 0 ? null : discountValue;
   const stockText = field(formData, "stock_quantity");
   const stockQuantity = stockText === "" ? 0 : Number(stockText);
+  const deliveryText = field(formData, "delivery_fee");
+  const deliveryFee = deliveryText === "" ? 0 : Number(deliveryText);
   const primarySelection = field(formData, "primarySelection");
 
   if (!name || name.length > 180) return { ok: false, error: "Enter a product name of 180 characters or fewer." };
@@ -139,6 +159,7 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
     return { ok: false, error: "The discount price must be a valid amount below the original price." };
   }
   if (!Number.isInteger(stockQuantity) || stockQuantity < 0) return { ok: false, error: "Enter a valid stock quantity of 0 or more." };
+  if (!Number.isFinite(deliveryFee) || deliveryFee < 0 || deliveryFee > 1000000) return { ok: false, error: "Enter a valid additional delivery fee in PKR." };
 
   const values = {
     name,
@@ -147,6 +168,7 @@ export async function saveProduct(formData: FormData): Promise<AdminActionResult
     category_id: categoryId || null,
     price,
     discount_price: discountPrice,
+    delivery_fee: Math.round(deliveryFee * 100) / 100,
     stock_quantity: stockQuantity,
     is_featured: formData.get("is_featured") === "on",
     is_sold: formData.get("is_sold") === "on",

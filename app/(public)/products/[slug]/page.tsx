@@ -111,6 +111,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <span className="text-xl font-semibold">{formatPKR(currentPrice)}</span>
           {hasDiscount && <span className="text-sm text-[#888] line-through">{formatPKR(product.price)}</span>}
         </div>
+        {Number(product.delivery_fee) > 0 && <p className="mt-2 text-xs text-[#777]">Additional delivery charge: {formatPKR(product.delivery_fee)} per item.</p>}
         {product.rating_count > 0 && <a href="#reviews-heading" className="mt-2 inline-flex items-center gap-2 text-xs text-[#666] hover:text-[#111]">
           <RatingStars value={product.rating_average} size={14} />
           <span>{Number(product.rating_average).toFixed(1)} · {product.rating_count} {product.rating_count === 1 ? "review" : "reviews"}</span>
@@ -128,6 +129,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 name: product.name,
                 price: product.price,
                 discountPrice: product.discount_price,
+                deliveryFee: Number(product.delivery_fee ?? 0),
                 imageUrl: product.primary_image_url,
                 stock: product.stock_quantity,
                 sold: product.is_sold,
@@ -143,6 +145,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 name: product.name,
                 price: product.price,
                 discountPrice: product.discount_price,
+                deliveryFee: Number(product.delivery_fee ?? 0),
                 imageUrl: product.primary_image_url,
                 stock: product.stock_quantity,
                 sold: product.is_sold,

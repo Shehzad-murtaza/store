@@ -12,7 +12,7 @@ export interface ProductWithCatalogData extends Product {
   primary_image_url: string | null;
 }
 
-export interface ProductCardData extends Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "category_id" | "is_sold" | "is_featured" | "stock_quantity" | "rating_average" | "rating_count" | "created_at" | "updated_at"> {
+export interface ProductCardData extends Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "delivery_fee" | "category_id" | "is_sold" | "is_featured" | "stock_quantity" | "rating_average" | "rating_count" | "created_at" | "updated_at"> {
   category: Pick<Category, "id" | "name" | "slug"> | null;
   primary_image_url: string | null;
 }
@@ -35,7 +35,7 @@ type ProductRow = Product & {
   category?: Pick<Category, "id" | "name" | "slug"> | null;
 };
 
-type ProductListingRow = Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "category_id" | "is_sold" | "is_featured" | "stock_quantity" | "rating_average" | "rating_count" | "created_at" | "updated_at"> & {
+type ProductListingRow = Pick<Product, "id" | "name" | "slug" | "price" | "discount_price" | "delivery_fee" | "category_id" | "is_sold" | "is_featured" | "stock_quantity" | "rating_average" | "rating_count" | "created_at" | "updated_at"> & {
   product_images: Array<Pick<ProductImage, "image_url" | "is_primary" | "sort_order">>;
   category?: Pick<Category, "id" | "name" | "slug"> | null;
 };
@@ -109,7 +109,6 @@ export const getProducts = unstable_cache(async (filters: ProductFilters = {}): 
   const searchTerm = filters.searchTerm?.trim().replace(/[\\%_,()]/g, " ").replace(/\s+/g, " ").trim();
   if (searchTerm) query = query.or(`name.ilike.%${searchTerm}%,slug.ilike.%${searchTerm}%`);
 
-  // Price filters use the amount customers pay when a discount is active.
   if (filters.minPrice !== undefined) {
     const value = filters.minPrice.toFixed(2);
     query = query.or(`discount_price.gte.${value},and(discount_price.is.null,price.gte.${value})`);
@@ -118,10 +117,7 @@ export const getProducts = unstable_cache(async (filters: ProductFilters = {}): 
     const value = filters.maxPrice.toFixed(2);
     query = query.or(`discount_price.lte.${value},and(discount_price.is.null,price.lte.${value})`);
   }
-
-  if (filters.sort !== "price-asc" && filters.sort !== "price-desc") {
-    query = query.order("created_at", { ascending: false });
-  }
+  if (filters.sort !== "price-asc" && filters.sort !== "price-desc") query = query.order("created_at", { ascending: false });
   if (filters.limit) query = query.limit(filters.limit);
 
   const { data, error } = await query;
@@ -138,6 +134,7 @@ export const getProducts = unstable_cache(async (filters: ProductFilters = {}): 
       slug: row.slug,
       price: row.price,
       discount_price: row.discount_price,
+      delivery_fee: Number(row.delivery_fee ?? 0),
       category_id: row.category_id,
       is_sold: row.is_sold,
       is_featured: row.is_featured,
