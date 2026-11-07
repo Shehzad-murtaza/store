@@ -24,15 +24,21 @@ export async function getCurrentCustomer() {
 export async function requireCustomer(nextPath = "/account") {
   const user = await getCurrentCustomer();
   if (!user) redirect(`/account/login?next=${encodeURIComponent(nextPath)}`);
+
+  const supabase = await createClient();
+  const { data: isAdmin, error } = await supabase.rpc("is_admin");
+  if (!error && isAdmin) redirect("/admin");
+
   return user;
 }
 
 /** Orders placed by the signed-in customer, newest first. RLS limits this to their own. */
-export async function getCustomerOrders(): Promise<CustomerOrderRow[]> {
+export async function getCustomerOrders(userId: string): Promise<CustomerOrderRow[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("orders")
     .select("*, order_items(count)")
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw new Error(`Could not load your orders: ${error.message}`);
 
@@ -44,12 +50,13 @@ export async function getCustomerOrders(): Promise<CustomerOrderRow[]> {
 }
 
 /** A single order owned by the signed-in customer, with its items. */
-export async function getCustomerOrder(orderNumber: string): Promise<CustomerOrder | null> {
+export async function getCustomerOrder(orderNumber: string, userId: string): Promise<CustomerOrder | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("orders")
     .select("*, order_items(*)")
     .eq("order_number", orderNumber)
+    .eq("user_id", userId)
     .maybeSingle();
   if (error) throw new Error(`Could not load your order: ${error.message}`);
   if (!data) return null;

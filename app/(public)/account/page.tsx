@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
   const user = await requireCustomer();
-  const orders = await getCustomerOrders();
+  const orders = await getCustomerOrders(user.id);
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-[840px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
     <header className="flex flex-wrap items-start justify-between gap-4">

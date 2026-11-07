@@ -13,9 +13,9 @@ type PageProps = { params: Promise<{ number: string }> };
 export default async function AccountOrderPage({ params }: PageProps) {
   const { number } = await params;
   const orderNumber = decodeURIComponent(number);
-  await requireCustomer(`/account/orders/${encodeURIComponent(orderNumber)}`);
+  const user = await requireCustomer(`/account/orders/${encodeURIComponent(orderNumber)}`);
 
-  const order = await getCustomerOrder(orderNumber);
+  const order = await getCustomerOrder(orderNumber, user.id);
   if (!order) notFound();
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-[840px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
