@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/supabase/admin";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { ToastProvider } from "@/components/ui/toast";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { AdminBackButton } from "@/components/admin/AdminBackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +19,10 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
         
         {/* Topline Header - Fixed alignment with no top margin */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-[#333] dark:bg-[#111] sm:px-6 sm:py-4">
-          <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
-            Store administration
-          </span>
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+            <AdminBackButton />
+            <span className="truncate text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Store administration</span>
+          </div>
           <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 sm:gap-4 sm:text-sm">
             <span className="hidden sm:inline">Pakistan · PKR</span>
             <ThemeToggle />

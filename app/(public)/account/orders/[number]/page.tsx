@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { OrderSummary } from "@/components/orders/OrderSummary";
 import { getCustomerOrder, requireCustomer } from "@/lib/supabase/customer";
+import { BackButton } from "@/components/layout/PublicBackButton";
 
 export const metadata: Metadata = { title: "Order details", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -19,7 +18,7 @@ export default async function AccountOrderPage({ params }: PageProps) {
   if (!order) notFound();
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-[840px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-    <Link href="/account" className="inline-flex items-center gap-2 text-xs text-[#666] hover:text-black"><ArrowLeft size={14} />Back to my orders</Link>
+    <BackButton fallbackHref="/account" />
     <div className="mt-6"><OrderSummary order={order.order} items={order.items} /></div>
   </main>;
 }

@@ -5,6 +5,7 @@ import { CustomerProfileOverview } from "@/components/account/CustomerProfileOve
 import { signOutAction } from "@/app/(public)/account/actions";
 import { getCustomerOrders, requireCustomer } from "@/lib/supabase/customer";
 import { formatDateTime } from "@/lib/catalog/format";
+import { BackButton } from "@/components/layout/PublicBackButton";
 
 export const metadata: Metadata = { title: "Your profile", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export default async function CustomerProfilePage() {
   const phone = typeof user.user_metadata?.phone === "string" ? user.user_metadata.phone : null;
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-[1080px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    <div className="mb-4"><BackButton fallbackHref="/" /></div>
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Your account</p>

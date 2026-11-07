@@ -4,6 +4,7 @@ import { ProductGridSkeleton, ProductResults } from "@/components/catalog/Produc
 import { ResponsiveProductFilters } from "@/components/catalog/ResponsiveProductFilters";
 import { parseCatalogFilters, type CatalogSearchParams } from "@/lib/catalog/filters";
 import { getCategories } from "@/lib/supabase/catalog";
+import { BackButton } from "@/components/layout/PublicBackButton";
 
 export const metadata: Metadata = {
   title: "All Products | SHEZY",
@@ -28,6 +29,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   return (
     <main className="mx-auto min-h-[70vh] max-w-[1280px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mb-4"><BackButton fallbackHref="/" /></div>
       <header className="mb-8 max-w-2xl sm:mb-10">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">
           The SHEZY Collection

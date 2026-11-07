@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, CircleCheck, MessageCircle, PackageSearch } from "lucide-react";
+import { CircleCheck, MessageCircle, PackageSearch } from "lucide-react";
 import { OrderLookupForm } from "@/components/orders/OrderLookupForm";
 import { OrderSummary } from "@/components/orders/OrderSummary";
 import { lookupOrder } from "@/lib/supabase/orders-public";
 import { SELLER_WHATSAPP } from "@/lib/site";
+import { BackButton } from "@/components/layout/PublicBackButton";
 
 export const metadata: Metadata = { title: "Order details", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -42,7 +43,7 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
   }
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-[840px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-    <Link href="/products" className="inline-flex items-center gap-2 text-xs text-[#666] hover:text-black"><ArrowLeft size={14} />Continue shopping</Link>
+    <BackButton fallbackHref="/products" />
 
     {order ? <>
       {placed && <div role="status" className="mt-6 flex items-start gap-3 rounded-xl border border-[#dfe9df] bg-[#f4f8f3] p-4 text-sm text-[#38583d]">

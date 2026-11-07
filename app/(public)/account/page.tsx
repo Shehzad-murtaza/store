@@ -6,6 +6,7 @@ import { signOutAction } from "@/app/(public)/account/actions";
 import { getCustomerOrders, requireCustomer, type CustomerOrderRow } from "@/lib/supabase/customer";
 import { formatDateTime, formatPKR } from "@/lib/catalog/format";
 import { orderStatusLabel, orderStatusTone } from "@/lib/catalog/orders";
+import { BackButton } from "@/components/layout/PublicBackButton";
 
 export const metadata: Metadata = { title: "My account", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -23,6 +24,7 @@ export default async function AccountPage() {
   }
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-[840px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    <div className="mb-4"><BackButton fallbackHref="/account/profile" /></div>
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Account</p>

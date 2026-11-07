@@ -408,6 +408,7 @@ html.dark .admin-mobile-bar button,
 html.dark .admin-sheet button:not(.login-submit) { background: #161616; border-color: #2a2a2a; color: #f5f5f5; }
 html.dark .admin-categories-table tbody tr:hover { background: #1c1c1c; }
 .login-page { position: relative; }
+.login-back { position: absolute; top: 22px; left: 24px; }
 .login-theme { position: absolute; top: 20px; right: 20px; }
 .admin-products-filter-form select { width: 180px; flex: 0 0 180px; }
 @container (max-width: 899px) {

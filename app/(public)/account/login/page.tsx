@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, CircleUserRound } from "lucide-react";
+import { CircleUserRound } from "lucide-react";
 import { AuthForm } from "@/components/account/AuthForm";
 import { getCurrentCustomer } from "@/lib/supabase/customer";
+import { BackButton } from "@/components/layout/PublicBackButton";
 
 export const metadata: Metadata = { title: "Sign in", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -23,7 +23,7 @@ export default async function AccountLoginPage({ searchParams }: PageProps) {
   if (user) redirect(nextPath);
 
   return <main className="mx-auto min-h-[60vh] w-full max-w-md px-4 py-8 sm:px-6 sm:py-12">
-    <Link href="/products" className="inline-flex items-center gap-2 text-xs text-[#666] hover:text-black"><ArrowLeft size={14} />Continue shopping</Link>
+    <BackButton fallbackHref="/products" />
 
     <div className="mt-8 text-center">
       <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#f5f5f4] text-[#555]"><CircleUserRound size={20} strokeWidth={1.5} /></span>

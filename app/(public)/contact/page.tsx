@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, MessageCircle, Phone } from "lucide-react";
 import { ContactForm } from "@/components/layout/ContactForm";
+import { BackButton } from "@/components/layout/PublicBackButton";
 import { SELLER_PHONE_DISPLAY, SELLER_WHATSAPP } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ const whatsappLink = `https://wa.me/${SELLER_WHATSAPP}?text=${encodeURIComponent
 export default function ContactPage() {
   return <main className="mx-auto min-h-[65vh] max-w-[1280px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
     <header className="mb-9 max-w-2xl">
+      <div className="mb-4"><BackButton fallbackHref="/" /></div>
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">We’re here to help</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Get in touch</h1>
       <p className="mt-3 text-sm leading-6 text-[#666]">Questions about a piece or just want to say hello? Send us a note and we’ll get back to you.</p>

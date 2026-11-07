@@ -5,6 +5,7 @@ import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { BackButton } from "@/components/layout/PublicBackButton";
 
 export const metadata: Metadata = { title: "Admin sign in" };
 
@@ -19,6 +20,7 @@ export default async function AdminLoginPage({ searchParams }: PageProps) {
 
   return <main className="login-page">
     <div className="login-theme"><ThemeToggle /></div>
+    <div className="login-back"><BackButton fallbackHref="/" /></div>
     <section className="login-card">
       <Link href="/" aria-label="SHEZY home" className="login-brand"><BrandLogo width={145} /></Link>
       <h1>Admin sign in</h1>
