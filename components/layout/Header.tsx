@@ -40,7 +40,8 @@ export function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className={`glass-site-header sticky top-0 z-50 w-full border-b ${onHome ? "home-hero-header" : ""}`}>
+    <>
+      <header className={`glass-site-header sticky top-0 z-50 w-full border-b ${onHome ? "home-hero-header" : ""}`}>
       <div className="mx-auto grid h-16 max-w-[1280px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-start">
           <button
@@ -81,6 +82,8 @@ export function Header() {
         </div>
       </div>
 
+      </header>
+
       {isMenuOpen && <div className="fixed inset-0 z-[70] bg-black/35 backdrop-blur-[2px] lg:hidden" onMouseDown={(event) => { if (event.target === event.currentTarget) setIsMenuOpen(false); }}>
         <aside id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Main menu" className="mobile-navigation-panel absolute left-3 right-3 top-[72px] rounded-2xl border p-3 shadow-xl">
           <div className="flex items-center justify-between border-b border-[#eaeaea] px-2 pb-3">
@@ -100,6 +103,6 @@ export function Header() {
           </div>
         </aside>
       </div>}
-    </header>
+    </>
   );
 }
