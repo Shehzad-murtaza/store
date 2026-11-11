@@ -86,7 +86,12 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
     p_items: items,
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    console.error("Could not create order:", error.message);
+    const expectedInventoryError = error.message.match(/^(A product in your cart is no longer available|Not enough stock for .+)$/);
+    if (expectedInventoryError) return { ok: false, error: expectedInventoryError[0] };
+    return { ok: false, error: "We could not complete your order because checkout is not fully configured. Please contact us and try again shortly." };
+  }
 
   const payload = data as { order_number?: string } | null;
   if (!payload?.order_number) return { ok: false, error: "The order could not be placed. Please try again." };
