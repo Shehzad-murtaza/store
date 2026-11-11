@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, LogOut, ReceiptText, UserRound } from "lucide-react";
+import { ArrowRight, ReceiptText, UserRound } from "lucide-react";
 import { EmptyState } from "@/components/catalog/EmptyState";
-import { signOutAction } from "@/app/(public)/account/actions";
+import { SignOutButton } from "@/components/account/SignOutButton";
 import { getCustomerOrders, requireCustomer, type CustomerOrderRow } from "@/lib/supabase/customer";
 import { formatDateTime, formatPKR } from "@/lib/catalog/format";
 import { orderStatusLabel, orderStatusTone } from "@/lib/catalog/orders";
@@ -33,9 +33,7 @@ export default async function AccountPage() {
       </div>
       <div className="flex items-center gap-2">
         <Link href="/account/profile" className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-3 text-sm text-[#444] transition-colors hover:bg-[#fafafa]"><UserRound size={15} /><span className="hidden sm:inline">Profile</span></Link>
-        <form action={signOutAction}>
-          <button type="submit" className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-3 sm:px-4 text-sm text-[#444] transition-colors hover:bg-[#fafafa]"><LogOut size={15} /><span className="hidden sm:inline">Sign out</span></button>
-        </form>
+        <SignOutButton className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-3 sm:px-4 text-sm text-[#444] transition-colors hover:bg-[#fafafa] disabled:opacity-60" compact iconOnly />
       </div>
     </header>
 

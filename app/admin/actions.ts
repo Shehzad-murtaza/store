@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -43,12 +42,6 @@ async function removeStoragePaths(paths: Array<string | null>) {
   const supabase = await createClient();
   const { error } = await supabase.storage.from("product-images").remove(uniquePaths);
   return error?.message ?? null;
-}
-
-export async function logoutAction() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/");
 }
 
 export async function saveDefaultDeliveryFee(formData: FormData): Promise<AdminActionResult> {

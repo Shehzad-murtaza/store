@@ -66,6 +66,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       readyRef.current = false;
       setReady(false);
       setUserId(nextUserId);
+      setLines([]);
 
       try { window.localStorage.removeItem(LEGACY_STORAGE_KEY); } catch { /* Storage can be unavailable. */ }
 
@@ -107,7 +108,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     void import("@/lib/supabase/client").then(({ createClient }) => {
       if (!active) return;
       const supabase = createClient();
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_OUT") {
+          try { window.sessionStorage.removeItem(STORAGE_KEY); } catch { /* Storage can be unavailable. */ }
+        }
         void hydrate(session?.user.id ?? null);
       });
       unsubscribe = () => subscription.unsubscribe();

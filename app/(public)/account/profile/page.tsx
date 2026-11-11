@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LogOut, PackageCheck, UserRound } from "lucide-react";
+import { PackageCheck, UserRound } from "lucide-react";
 import { CustomerProfileOverview } from "@/components/account/CustomerProfileOverview";
-import { signOutAction } from "@/app/(public)/account/actions";
+import { SignOutButton } from "@/components/account/SignOutButton";
 import { getCustomerOrders, requireCustomer } from "@/lib/supabase/customer";
 import { formatDateTime } from "@/lib/catalog/format";
 import { BackButton } from "@/components/layout/PublicBackButton";
@@ -30,9 +30,7 @@ export default async function CustomerProfilePage() {
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Profile</h1>
         <p className="mt-2 max-w-xl text-sm leading-6 text-[#666]">Your details and everything you have saved with SHEZY.</p>
       </div>
-      <form action={signOutAction}>
-        <button type="submit" className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-4 text-sm text-[#444] transition-colors hover:bg-[#fafafa]"><LogOut size={15} />Sign out</button>
-      </form>
+      <SignOutButton className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#eaeaea] px-4 text-sm text-[#444] transition-colors hover:bg-[#fafafa] disabled:opacity-60" />
     </header>
 
     <section aria-label="Profile information" className="mt-7 flex flex-wrap items-center gap-4 rounded-2xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">

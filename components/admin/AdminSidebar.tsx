@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BarChart3, LayoutDashboard, Layers3, LogOut, Menu, Package, ReceiptText, Settings2, Star, Store, X } from "lucide-react";
-import { logoutAction } from "@/app/admin/actions";
+import { BarChart3, LayoutDashboard, Layers3, Menu, Package, ReceiptText, Settings2, Star, Store, X } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { SignOutButton } from "@/components/account/SignOutButton";
 
 const navigation = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -39,7 +39,7 @@ export function AdminSidebar({ email }: { email: string }) {
         <div className="truncate text-sm text-[#777]" title={email}>{email}</div>
         <div className="mt-3 grid gap-1">
           <Link href="/" className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-[#555] hover:bg-[#f3f3f3]"><Store size={15} />View storefront</Link>
-          <form action={logoutAction}><button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-[#555] hover:bg-[#f3f3f3]"><LogOut size={15} />Sign out</button></form>
+          <SignOutButton className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-[#555] hover:bg-[#f3f3f3] disabled:opacity-60" compact />
         </div>
       </div>
     </aside>
@@ -50,7 +50,7 @@ export function AdminSidebar({ email }: { email: string }) {
         <div className="mb-7 flex items-center justify-between"><Link href="/admin" aria-label="SHEZY admin dashboard" className="inline-flex"><BrandLogo width={132} /></Link><button type="button" onClick={() => setOpen(false)} aria-label="Close admin navigation" className="rounded-lg p-2 text-[#555] hover:bg-[#f2f2f2]"><X size={18} /></button></div>
         <div className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#777]">Workspace</div>
         <NavLinks onNavigate={() => setOpen(false)} />
-        <div className="admin-sheet-bottom mt-auto border-t border-[#eaeaea] px-4 py-4"><div className="truncate text-sm text-[#777]" title={email}>{email}</div><div className="mt-3 grid gap-1"><Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3]"><Store size={15} />View storefront</Link><form action={logoutAction}><button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3]"><LogOut size={15} />Sign out</button></form></div></div>
+        <div className="admin-sheet-bottom mt-auto border-t border-[#eaeaea] px-4 py-4"><div className="truncate text-sm text-[#777]" title={email}>{email}</div><div className="mt-3 grid gap-1"><Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3]"><Store size={15} />View storefront</Link><SignOutButton className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#555] hover:bg-[#f3f3f3] disabled:opacity-60" compact /></div></div>
       </aside>
     </div>}
   </>;
