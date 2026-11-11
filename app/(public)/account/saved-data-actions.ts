@@ -95,12 +95,12 @@ export async function syncCustomerCart(userId: string, lines: Array<{ productId:
   const { error } = await current.supabase.rpc("sync_customer_cart", {
     p_items: lines.map(({ productId, quantity }) => ({ product_id: productId, quantity })),
   });
-  if (error) console.error("Could not sync customer cart:", error.message);
+  if (error) throw new Error(`Could not sync customer cart: ${error.message}`);
 }
 
 export async function syncCustomerWishlist(userId: string, productIds: string[]) {
   const current = await currentUserId();
   if (!current || current.userId !== userId) return;
   const { error } = await current.supabase.rpc("sync_customer_wishlist", { p_product_ids: productIds });
-  if (error) console.error("Could not sync customer wishlist:", error.message);
+  if (error) throw new Error(`Could not sync customer wishlist: ${error.message}`);
 }

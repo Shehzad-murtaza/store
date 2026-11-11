@@ -116,7 +116,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     if (userId) {
       const snapshot = items.map(({ id }) => id);
       const timer = window.setTimeout(() => {
-        persistQueue.current = persistQueue.current.then(() => syncCustomerWishlist(userId, snapshot));
+        persistQueue.current = persistQueue.current
+          .then(() => syncCustomerWishlist(userId, snapshot))
+          .catch((error) => { console.error("Could not persist customer wishlist:", error); });
       }, 250);
       return () => window.clearTimeout(timer);
     }

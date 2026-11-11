@@ -23,14 +23,18 @@ export interface PlaceOrderResult {
 export async function getDeliveryQuote(productIds: string[]): Promise<{ defaultDeliveryFee: number; productFees: Record<string, number> }> {
   const supabase = await createClient();
   const ids = [...new Set(productIds.filter(Boolean))].slice(0, 100);
-  const [{ data: settings }, { data: products }] = await Promise.all([
+  const [settingsResult, productsResult] = await Promise.all([
     supabase.from("store_settings").select("default_delivery_fee").eq("id", true).maybeSingle(),
-    ids.length ? supabase.from("products").select("id, delivery_fee").in("id", ids) : Promise.resolve({ data: [] as Array<{ id: string; delivery_fee: number }> }),
+    ids.length ? supabase.from("products").select("id, delivery_fee").in("id", ids) : Promise.resolve({ data: [] as Array<{ id: string; delivery_fee: number }>, error: null }),
   ]);
+  if (settingsResult.error || (ids.length && productsResult.error)) {
+    console.error("Delivery pricing is not configured in Supabase:", settingsResult.error?.message ?? productsResult.error?.message);
+    throw new Error("Delivery pricing is unavailable.");
+  }
 
   return {
-    defaultDeliveryFee: Number(settings?.default_delivery_fee ?? 0),
-    productFees: Object.fromEntries((products ?? []).map((product) => [product.id, Number(product.delivery_fee ?? 0)])),
+    defaultDeliveryFee: Number(settingsResult.data?.default_delivery_fee ?? 0),
+    productFees: Object.fromEntries((productsResult.data ?? []).map((product) => [product.id, Number(product.delivery_fee ?? 0)])),
   };
 }
 
@@ -60,6 +64,16 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
   if (!items.length) return { ok: false, error: "Your cart is empty." };
 
   const supabase = await createClient();
+  const productIds = [...new Set(items.map(({ product_id }) => product_id))];
+  const [settingsCheck, productFeesCheck] = await Promise.all([
+    supabase.from("store_settings").select("id").eq("id", true).maybeSingle(),
+    supabase.from("products").select("id, delivery_fee").in("id", productIds),
+  ]);
+  if (settingsCheck.error || productFeesCheck.error || !settingsCheck.data || (productFeesCheck.data?.length ?? 0) !== productIds.length) {
+    console.error("Cannot place checkout while delivery pricing is unavailable:", settingsCheck.error?.message ?? productFeesCheck.error?.message ?? "Delivery settings or product pricing are missing.");
+    return { ok: false, error: "We could not confirm the delivery charges. Please try again in a moment or contact us on WhatsApp." };
+  }
+
   const { data, error } = await supabase.rpc("place_order", {
     p_customer_name: customerName,
     p_customer_phone: customerPhone,

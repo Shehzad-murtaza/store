@@ -126,7 +126,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (userId) {
       const snapshot = lines.map(({ productId, quantity }) => ({ productId, quantity }));
       const timer = window.setTimeout(() => {
-        persistQueue.current = persistQueue.current.then(() => syncCustomerCart(userId, snapshot));
+        persistQueue.current = persistQueue.current
+          .then(() => syncCustomerCart(userId, snapshot))
+          .catch((error) => { console.error("Could not persist customer cart:", error); });
       }, 250);
       return () => window.clearTimeout(timer);
     }

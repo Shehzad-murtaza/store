@@ -523,19 +523,50 @@ set search_path = ''
 as $$
 declare
   v_result json;
+  v_phone_digits text := regexp_replace(coalesce(p_phone, ''), '\D', '', 'g');
 begin
+  -- A complete Pakistani mobile number is required; partial suffixes must never match.
+  if not (
+    (length(v_phone_digits) = 11 and left(v_phone_digits, 2) = '03')
+    or (length(v_phone_digits) = 12 and left(v_phone_digits, 3) = '923')
+  ) then
+    return null;
+  end if;
+
   select json_build_object(
-    'order', to_jsonb(o) - 'admin_notes' - 'user_id',
-    'items', coalesce(
-      (select json_agg(to_jsonb(i) order by i.id) from public.order_items i where i.order_id = o.id),
-      '[]'::json
-    )
+    'order', json_build_object(
+      'order_number', o.order_number,
+      'payment_method', o.payment_method,
+      'payment_status', o.payment_status,
+      'amount_paid', o.amount_paid,
+      'status', o.status,
+      'tracking_number', o.tracking_number,
+      'subtotal', o.subtotal,
+      'shipping_fee', o.shipping_fee,
+      'total', o.total,
+      'shipped_at', o.shipped_at,
+      'delivered_at', o.delivered_at,
+      'created_at', o.created_at
+    ),
+    'items', coalesce((
+      select json_agg(json_build_object(
+        'id', i.id,
+        'order_id', i.order_id,
+        'product_id', i.product_id,
+        'product_name', i.product_name,
+        'product_slug', i.product_slug,
+        'unit_price', i.unit_price,
+        'quantity', i.quantity,
+        'line_total', i.line_total
+      ) order by i.id)
+      from public.order_items i where i.order_id = o.id
+    ), '[]'::json)
   )
   into v_result
   from public.orders o
   where upper(trim(o.order_number)) = upper(trim(p_order_number))
     and right(regexp_replace(o.customer_phone, '\D', '', 'g'), 10)
-        = right(regexp_replace(coalesce(p_phone, ''), '\D', '', 'g'), 10);
+        = right(v_phone_digits, 10);
 
   return v_result;
 end;

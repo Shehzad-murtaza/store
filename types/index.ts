@@ -74,6 +74,22 @@ export interface OrderItem {
   line_total: number;
 }
 
+/** The limited order fields intentionally exposed to guest order tracking. */
+export type TrackedOrder = Pick<Order,
+  | "order_number"
+  | "payment_method"
+  | "payment_status"
+  | "amount_paid"
+  | "status"
+  | "tracking_number"
+  | "subtotal"
+  | "shipping_fee"
+  | "total"
+  | "shipped_at"
+  | "delivered_at"
+  | "created_at"
+>;
+
 export interface Review {
   id: string;
   product_id: string;

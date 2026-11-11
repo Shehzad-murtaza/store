@@ -3,9 +3,9 @@ import { Truck, Wallet } from "lucide-react";
 import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import { formatDateTime, formatPKR } from "@/lib/catalog/format";
 import { orderStatusLabel, orderStatusTone, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS } from "@/lib/catalog/orders";
-import type { Order, OrderItem } from "@/types";
+import type { OrderItem, TrackedOrder } from "@/types";
 
-export function OrderSummary({ order, items }: { order: Order; items: OrderItem[] }) {
+export function OrderSummary({ order, items }: { order: TrackedOrder; items: OrderItem[] }) {
   const tone = orderStatusTone(order.status);
 
   return <div className="space-y-6">
@@ -46,19 +46,7 @@ export function OrderSummary({ order, items }: { order: Order; items: OrderItem[
       </dl>}
     </section>
 
-    <div className="grid gap-6 sm:grid-cols-2">
-      <section className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">
-        <h3 className="text-sm font-semibold tracking-[-0.02em]">Delivery details</h3>
-        <dl className="mt-4 space-y-2 text-sm">
-          <div><dt className="text-xs uppercase tracking-[0.1em] text-[#888]">Name</dt><dd className="mt-0.5">{order.customer_name}</dd></div>
-          <div><dt className="text-xs uppercase tracking-[0.1em] text-[#888]">Phone</dt><dd className="mt-0.5">{order.customer_phone}</dd></div>
-          <div><dt className="text-xs uppercase tracking-[0.1em] text-[#888]">Address</dt><dd className="mt-0.5 whitespace-pre-line">{order.address}</dd></div>
-          <div><dt className="text-xs uppercase tracking-[0.1em] text-[#888]">City</dt><dd className="mt-0.5">{order.city}</dd></div>
-          {order.notes && <div><dt className="text-xs uppercase tracking-[0.1em] text-[#888]">Notes</dt><dd className="mt-0.5 whitespace-pre-line">{order.notes}</dd></div>}
-        </dl>
-      </section>
-
-      <section className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">
+    <section className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm sm:p-6">
         <h3 className="text-sm font-semibold tracking-[-0.02em]">Payment</h3>
         <div className="mt-4 flex items-start gap-3">
           {order.payment_method === "cod" ? <Truck size={18} className="mt-0.5 shrink-0 text-[#555]" /> : <Wallet size={18} className="mt-0.5 shrink-0 text-[#555]" />}
@@ -69,6 +57,5 @@ export function OrderSummary({ order, items }: { order: Order; items: OrderItem[
           </div>
         </div>
       </section>
-    </div>
   </div>;
 }
