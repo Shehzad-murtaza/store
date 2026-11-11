@@ -36,8 +36,8 @@ async function AdminDashboard() {
   return <main className="admin-content">
     <div className="mb-7 flex flex-wrap items-end justify-between gap-4"><div><div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#777]">Store overview</div><h1>Dashboard</h1><p className="!mt-1">A quick look at your SHEZY store.</p></div><Link href="/admin/products/new" className="inline-flex items-center gap-2 rounded-lg bg-[#1a1a1a] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#333]">Add product <ArrowRight size={14} /></Link></div>
 
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {sales.map(({ label, value, hint, icon: Icon, href }) => <Link href={href} key={label} className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm transition hover:shadow-md"><div className="flex items-center justify-between"><span className="text-xs text-[#666]">{label}</span><Icon size={17} className="text-[#777]" /></div><div className="mt-4 text-3xl font-semibold tracking-[-0.04em]">{value}</div>{hint && <div className="mt-1.5 text-[11px] text-[#777]">{hint}</div>}</Link>)}
+    <section className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
+      {sales.map(({ label, value, hint, icon: Icon, href }) => <Link href={href} key={label} className="min-w-0 rounded-xl border border-[#eaeaea] bg-white p-3 shadow-sm transition hover:shadow-md sm:p-5"><div className="flex items-center justify-between gap-2"><span className="min-w-0 text-[11px] leading-4 text-[#666] sm:text-xs">{label}</span><Icon size={16} className="shrink-0 text-[#777] sm:size-[17px]" /></div><div className="mt-3 truncate text-2xl font-semibold tracking-[-0.04em] sm:mt-4 sm:text-3xl" title={String(value)}>{value}</div>{hint && <div className="mt-1.5 truncate text-[10px] leading-4 text-[#777] sm:text-[11px]" title={hint}>{hint}</div>}</Link>)}
     </section>
 
     <section className="mt-8 overflow-hidden rounded-xl border border-[#eaeaea] bg-white shadow-sm">
@@ -71,8 +71,8 @@ async function AdminDashboard() {
       </div>
     </section>
 
-    <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map(({ label, value, icon: Icon, href }) => <Link href={href} key={label} className="rounded-xl border border-[#eaeaea] bg-white p-5 shadow-sm transition hover:shadow-md"><div className="flex items-center justify-between"><span className="text-xs text-[#666]">{label}</span><Icon size={17} className="text-[#777]" /></div><div className="mt-4 text-3xl font-semibold tracking-[-0.04em]">{value}</div></Link>)}
+    <section className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+      {stats.map(({ label, value, icon: Icon, href }) => <Link href={href} key={label} className="min-w-0 rounded-xl border border-[#eaeaea] bg-white p-3 shadow-sm transition hover:shadow-md sm:p-5"><div className="flex items-center justify-between gap-2"><span className="min-w-0 text-[11px] leading-4 text-[#666] sm:text-xs">{label}</span><Icon size={16} className="shrink-0 text-[#777] sm:size-[17px]" /></div><div className="mt-3 text-2xl font-semibold tracking-[-0.04em] sm:mt-4 sm:text-3xl">{value}</div></Link>)}
     </section>
 
     <section className="mt-8 overflow-hidden rounded-xl border border-[#eaeaea] bg-white shadow-sm">

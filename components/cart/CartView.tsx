@@ -66,8 +66,8 @@ export default function CartView({ defaultDeliveryFee }: { defaultDeliveryFee: n
 
 function QuantityControl({ name, quantity, max, onChange }: { name: string; quantity: number; max: number; onChange: (quantity: number) => void }) {
   return <div className="inline-flex h-9 items-center rounded-lg border border-[#eaeaea] bg-white">
-    <button type="button" onClick={() => onChange(quantity - 1)} disabled={quantity <= 1} aria-label={`Decrease quantity of ${name}`} className="grid size-8 place-items-center rounded-l-lg text-[#555] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-40"><Minus size={13} /></button>
+    <button type="button" onClick={() => onChange(quantity - 1)} disabled={quantity <= 1} aria-label={`Decrease quantity of ${name}`} className="grid size-9 place-items-center rounded-l-lg text-[#555] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-40"><Minus size={13} /></button>
     <span aria-live="polite" className="w-7 text-center text-xs font-medium tabular-nums">{quantity}</span>
-    <button type="button" onClick={() => onChange(quantity + 1)} disabled={quantity >= max} aria-label={`Increase quantity of ${name}`} className="grid size-8 place-items-center rounded-r-lg text-[#555] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-40"><Plus size={13} /></button>
+    <button type="button" onClick={() => onChange(quantity + 1)} disabled={quantity >= max} aria-label={`Increase quantity of ${name}`} className="grid size-9 place-items-center rounded-r-lg text-[#555] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-40"><Plus size={13} /></button>
   </div>;
 }

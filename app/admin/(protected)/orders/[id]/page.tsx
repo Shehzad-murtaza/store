@@ -70,10 +70,10 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
             <thead><tr><th>Item</th><th>Unit price</th><th>Qty</th><th className="text-right">Total</th></tr></thead>
             <tbody>
               {order.order_items.map((item) => <tr key={item.id}>
-                <td><div className="font-medium text-[#222]">{item.product_name}</div>{item.product_slug && <div className="mt-0.5 text-[10px] text-[#888]">{item.product_slug}</div>}</td>
-                <td className="whitespace-nowrap">{formatPKR(item.unit_price)}</td>
-                <td>{item.quantity}</td>
-                <td className="whitespace-nowrap text-right font-medium">{formatPKR(item.line_total)}</td>
+                <td data-label="Item"><div className="font-medium text-[#222]">{item.product_name}</div>{item.product_slug && <div className="mt-0.5 text-[10px] text-[#888]">{item.product_slug}</div>}</td>
+                <td data-label="Unit price" className="whitespace-nowrap">{formatPKR(item.unit_price)}</td>
+                <td data-label="Qty">{item.quantity}</td>
+                <td data-label="Total" className="whitespace-nowrap text-right font-medium">{formatPKR(item.line_total)}</td>
               </tr>)}
             </tbody>
           </table>

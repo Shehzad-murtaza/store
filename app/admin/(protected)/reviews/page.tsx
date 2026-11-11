@@ -52,12 +52,12 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
 
     {reviews.length ? <div className="admin-table-wrap"><table className="admin-table admin-reviews-table"><thead><tr><th>Product</th><th>Customer</th><th>Rating</th><th>Review</th><th>Status</th><th className="text-right">Actions</th></tr></thead><tbody>
       {reviews.map((review) => <tr key={review.id}>
-        <td>{review.product ? <Link href={`/products/${review.product.slug}`} className="font-medium text-[#222] hover:underline">{review.product.name}</Link> : <span className="text-[#888]">Deleted product</span>}</td>
-        <td><div className="max-w-40 truncate font-medium text-[#222]">{review.customer_name}</div><div className="mt-1 text-[10px] text-[#888]">{formatDateTime(review.created_at)}</div></td>
-        <td><RatingStars value={review.rating} size={13} /></td>
-        <td><div className="max-w-72 whitespace-pre-line text-xs leading-5 text-[#555]">{review.comment || <span className="text-[#999]">No comment</span>}</div></td>
-        <td><span className={`status-pill ${STATUS_TONES[review.status]}`}>{STATUS_LABELS[review.status]}</span></td>
-        <td><ReviewActions reviewId={review.id} status={review.status} /></td>
+        <td data-label="Product">{review.product ? <Link href={`/products/${review.product.slug}`} className="font-medium text-[#222] hover:underline">{review.product.name}</Link> : <span className="text-[#888]">Deleted product</span>}</td>
+        <td data-label="Customer"><div className="max-w-40 truncate font-medium text-[#222]">{review.customer_name}</div><div className="mt-1 text-[10px] text-[#888]">{formatDateTime(review.created_at)}</div></td>
+        <td data-label="Rating"><RatingStars value={review.rating} size={13} /></td>
+        <td data-label="Review"><div className="max-w-72 whitespace-pre-line text-xs leading-5 text-[#555]">{review.comment || <span className="text-[#999]">No comment</span>}</div></td>
+        <td data-label="Status"><span className={`status-pill ${STATUS_TONES[review.status]}`}>{STATUS_LABELS[review.status]}</span></td>
+        <td data-label="Actions"><ReviewActions reviewId={review.id} status={review.status} /></td>
       </tr>)}
     </tbody></table></div> : hasFilters
       ? <EmptyState title="No reviews match these filters" description="Try changing the search or filters to see more reviews." actionHref="/admin/reviews" actionLabel="Clear filters" />

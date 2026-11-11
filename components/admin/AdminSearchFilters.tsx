@@ -51,7 +51,7 @@ export function AdminSearchFilters({
 
   const hasFilters = searchParams.toString().length > 0;
 
-  return <div className={`flex min-w-0 flex-1 flex-wrap items-center gap-3 transition-opacity duration-150${isPending ? " opacity-60" : ""}`} aria-busy={isPending}>
+  return <div className={`admin-search-filters flex min-w-0 flex-1 flex-wrap items-center gap-3 transition-opacity duration-150${isPending ? " opacity-60" : ""}`} aria-busy={isPending}>
     <label className="relative min-w-[220px] flex-1"><span className="sr-only">{searchAriaLabel}</span><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#888]" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={searchPlaceholder} className="admin-input admin-search-input h-10" /></label>
     {selects.map((select) => <label key={select.name} className="shrink-0"><span className="sr-only">{select.ariaLabel}</span><select value={searchParams.get(select.name) ?? ""} onChange={(event) => update({ [select.name]: event.target.value || null })} className={`admin-select h-10 ${select.widthClass ?? "w-[170px]"}`}>{select.options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>)}
     {checkbox && <label className="flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-[#eaeaea] px-3 text-xs text-[#555]"><input type="checkbox" checked={searchParams.get(checkbox.name) === checkbox.value} onChange={(event) => update({ [checkbox.name]: event.target.checked ? checkbox.value : null })} className="size-4 accent-[#1a1a1a]" />{checkbox.label}</label>}

@@ -105,9 +105,6 @@ export default function CheckoutForm({ defaultDeliveryFee }: { defaultDeliveryFe
         </div>
       </section>
       {error && <p role="alert" className="rounded-lg border border-[#e4c4c1] bg-[#fff7f6] px-4 py-3 text-sm text-[#7c3732]">{error}</p>}
-      <button type="submit" disabled={submitting} className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#111] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-wait disabled:opacity-60 sm:hidden">
-        {submitting ? <><LoaderCircle size={16} className="animate-spin" />Placing order…</> : <><ShieldCheck size={16} />Place order · {formatPKR(total)}</>}
-      </button>
     </form>
 
     <aside className="rounded-xl border border-[#eaeaea] bg-white p-4 shadow-sm sm:p-5 lg:sticky lg:top-24">
@@ -128,8 +125,8 @@ export default function CheckoutForm({ defaultDeliveryFee }: { defaultDeliveryFe
         {productDelivery > 0 && <div className="flex items-center justify-between gap-3"><dt className="text-[#666]">Product delivery extras</dt><dd className="font-medium">{formatPKR(productDelivery)}</dd></div>}
         <div className="flex items-center justify-between gap-3 border-t border-[#eaeaea] pt-3"><dt className="font-semibold">Total</dt><dd className="text-base font-semibold">{formatPKR(total)}</dd></div>
       </dl>
-      <button type="submit" form="checkout-form" disabled={submitting} className="mt-5 hidden h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#111] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-wait disabled:opacity-60 sm:inline-flex">
-        {submitting ? <><LoaderCircle size={16} className="animate-spin" />Placing order…</> : <><ShieldCheck size={16} />Place order</>}
+      <button type="submit" form="checkout-form" disabled={submitting} className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#111] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-wait disabled:opacity-60">
+        {submitting ? <><LoaderCircle size={16} className="animate-spin" />Placing order…</> : <><ShieldCheck size={16} />Place order<span className="sm:hidden"> · {formatPKR(total)}</span></>}
       </button>
       <p className="mt-3 text-center text-[11px] leading-5 text-[#777]">Your order is confirmed by our team before fulfilment.</p>
     </aside>

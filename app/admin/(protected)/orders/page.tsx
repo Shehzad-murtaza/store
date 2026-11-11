@@ -48,15 +48,15 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
       <span className="shrink-0 whitespace-nowrap text-sm text-neutral-500">{orders.length} {orders.length === 1 ? "order" : "orders"}</span>
     </div>
 
-    {orders.length ? <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th className="text-right">Actions</th></tr></thead><tbody>
+    {orders.length ? <div className="admin-table-wrap"><table className="admin-table admin-orders-table"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th className="text-right">Actions</th></tr></thead><tbody>
       {orders.map((order) => <tr key={order.id}>
-        <td><Link href={`/admin/orders/${order.id}`} className="font-medium text-[#222] hover:underline">{order.order_number}</Link><div className="mt-1 text-[10px] text-[#888]">{formatDateTime(order.created_at)}</div></td>
-        <td><div className="max-w-52 truncate font-medium text-[#222]">{order.customer_name}</div><div className="mt-1 text-[10px] text-[#888]">{order.customer_phone}</div></td>
-        <td>{order.item_count}</td>
-        <td className="whitespace-nowrap font-medium">{formatPKR(order.total)}</td>
-        <td><div className="whitespace-nowrap text-xs text-[#555]">{order.payment_method === "cod" ? "Cash on delivery" : "Bank transfer"}</div><span className={`admin-status mt-1 ${order.payment_status === "paid" ? "available" : order.payment_status === "partial" ? "featured" : "sold"}`}>{PAYMENT_STATUS_LABELS[order.payment_status]}</span></td>
-        <td><span className={`status-pill ${orderStatusTone(order.status)}`}>{orderStatusLabel(order.status)}</span></td>
-        <td><div className="flex justify-end gap-2"><Link href={`/admin/orders/${order.id}`} className="inline-flex items-center gap-1.5 rounded-lg border border-[#eaeaea] px-3 py-2 text-xs font-medium hover:bg-[#f7f7f7]">View <ArrowRight size={13} /></Link><ConfirmDialog title={`Delete order ${order.order_number}?`} description="This permanently removes the order and its items from the database. This action cannot be undone." action={deleteOrder} actionId={order.id} compact /></div></td>
+        <td data-label="Order"><Link href={`/admin/orders/${order.id}`} className="font-medium text-[#222] hover:underline">{order.order_number}</Link><div className="mt-1 text-[10px] text-[#888]">{formatDateTime(order.created_at)}</div></td>
+        <td data-label="Customer"><div className="max-w-52 truncate font-medium text-[#222]">{order.customer_name}</div><div className="mt-1 text-[10px] text-[#888]">{order.customer_phone}</div></td>
+        <td data-label="Items">{order.item_count}</td>
+        <td data-label="Total" className="whitespace-nowrap font-medium">{formatPKR(order.total)}</td>
+        <td data-label="Payment"><div className="whitespace-nowrap text-xs text-[#555]">{order.payment_method === "cod" ? "Cash on delivery" : "Bank transfer"}</div><span className={`admin-status mt-1 ${order.payment_status === "paid" ? "available" : order.payment_status === "partial" ? "featured" : "sold"}`}>{PAYMENT_STATUS_LABELS[order.payment_status]}</span></td>
+        <td data-label="Status"><span className={`status-pill ${orderStatusTone(order.status)}`}>{orderStatusLabel(order.status)}</span></td>
+        <td data-label="Actions"><div className="flex justify-end gap-2"><Link href={`/admin/orders/${order.id}`} className="inline-flex items-center gap-1.5 rounded-lg border border-[#eaeaea] px-3 py-2 text-xs font-medium hover:bg-[#f7f7f7]">View <ArrowRight size={13} /></Link><ConfirmDialog title={`Delete order ${order.order_number}?`} description="This permanently removes the order and its items from the database. This action cannot be undone." action={deleteOrder} actionId={order.id} compact /></div></td>
       </tr>)}
     </tbody></table></div> : hasFilters
       ? <EmptyState title="No orders match these filters" description="Try changing the search or filters to see more orders." actionHref="/admin/orders" actionLabel="Clear filters" />
